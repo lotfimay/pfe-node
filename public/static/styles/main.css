@@ -1,0 +1,148 @@
+body{
+    display: flex;
+    flex-direction: row;
+    font-family: 'Poppins';
+    height: 100vh;
+    width: 100vw;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    background-color: whitesmoke;
+}
+.container{
+    height: 100%;
+    width: 100vw;
+    display: flex;
+    flex-direction: row;
+    margin-top: -0.5em;
+    margin-left: -0.5em;
+}
+.navbare{
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    width: 20%;
+    background-color: #1D6F42;
+}
+.navbare .buttons{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+.navbare .buttons h3{
+    color: #a8a9ad;
+    margin-left: 1em;
+    margin-bottom: -0.1em;
+}
+.navbare .buttons .button{
+    display: flex;
+    flex-direction: column;
+    color: whitesmoke;
+    font-size: 15px;
+    margin-top: 1em;
+    border-radius: 20px;
+    margin-left: 1.2em;
+    cursor: pointer;
+    height: 100%;
+    width: 100%;
+    padding-left: 0.5em;
+}
+.navbare .buttons .button .scrollnav{
+    overflow-y: scroll;
+    height: 80%;
+    width: 90%;
+}
+.navbare .buttons .button .scrollnav .Npalier .headerB{
+    width: 90%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background-color: whitesmoke;
+    color: #1D6F42;
+    font-weight: 600;
+    border-radius: 25px;
+    height: 5vh;
+    padding-left: 0.5em;
+}
+.Npalier{
+    margin-top: 1em;
+}
+.navbare .buttons .button .scrollnav .Npalier .specialites{
+    flex-direction: column;
+    margin-left: 1.5em;
+    margin-top: 0.2em;
+    display: none;   
+}
+.navbare .buttons .button .scrollnav .Npalier .specialites .Nspeacialite{
+    width: 80%;
+    display: flex;
+    flex-direction: column;
+}
+.navbare .buttons .button .scrollnav .Npalier .specialites .Nspeacialite .Hspecialite{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+} 
+.navbare .buttons .button .scrollnav .Npalier .specialites .Nspeacialite .Palier{
+    display: none;
+    flex-direction: column;
+    margin-left: 0.2em;
+}
+.navbare .buttons .button .scrollnav .Npalier .specialites .Nspeacialite .Palier .NPalier{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    margin-top: -1em;
+}
+.navbare .buttons .button .scrollnav .Npalier .specialites .Nspeacialite .Palier .NPalier ion-icon{
+    font-size: 12px;
+}
+.navbare .buttons .button .scrollnav .Npalier .specialites .Nspeacialite p{
+    font-size: 13px;
+}
+.navbare .buttons .button ion-icon{
+    margin-right: 0.4em;
+    font-size: 18px;
+}
+.navbare .buttons .button p{
+    font-size: 15px;
+}
+.navbare .top{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+.navbare .top h1{
+    font-size: 18px;
+    color: whitesmoke;
+}
+.navbare .top ion-icon{
+    font-size: 22px;
+    margin-right: 0.2em;
+    color: whitesmoke;
+}
+.menu{
+    display: flex;
+    flex-direction: column;
+    width: 80%;
+    background-color: whitesmoke;
+}
+::-webkit-scrollbar{
+    width: 0.8em;
+}
+::-webkit-scrollbar-track{
+    border-radius: 20px;
+    background-color: hsl(140 42% 42% / 0.5);
+
+}
+::-webkit-scrollbar-thumb{
+    background: whitesmoke;
+    border-radius: 20vw;
+    cursor: default;
+}
+
+.show{
+    display: flex !important;
+}

@@ -1,0 +1,146 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Creneau {
+  date        DateTime      @db.Date
+  start_time  DateTime      @db.Timestamp(6)
+  end_time    DateTime      @db.Timestamp(6)
+  Examen      Examen[]
+  Reservation Reservation[]
+
+  @@id([date, start_time, end_time], map: "PK_CRENEAU")
+}
+
+model Departement {
+  code_departement String       @id(map: "PK_DEPARTEMENT") @db.VarChar(255)
+  nom_departement  String       @db.VarChar(255)
+  Specialite       Specialite[]
+}
+
+model Enseignant {
+  code_enseignant   String         @id(map: "PK_ENSEIGNANT") @db.VarChar(30)
+  nom_enseignant    String         @db.VarChar(100)
+  prenom_enseignant String         @db.VarChar(100)
+  email             String         @unique(map: "UNIQUE_EMAIL") @db.VarChar(255)
+  telephone_1       String?        @db.VarChar(10)
+  telephone_2       String?        @db.VarChar(10)
+  code_grade        String         @db.VarChar(30)
+  Grade             Grade          @relation(fields: [code_grade], references: [code_grade], onDelete: SetNull, onUpdate: NoAction, map: "FK_ENSEIGNANT_GRADE")
+  Surveillance      Surveillance[]
+}
+
+model Examen {
+  code_module  String        @db.VarChar(30)
+  code_section String        @db.VarChar(30)
+  date         DateTime      @db.Date
+  start_time   DateTime      @db.Timestamp(6)
+  end_time     DateTime      @db.Timestamp(6)
+  Module       Module        @relation(fields: [code_module], references: [code_module], onDelete: Cascade, onUpdate: NoAction, map: "FK_EXAMEN_MODULE")
+  Section      Section       @relation(fields: [code_section], references: [code_section], onDelete: Cascade, onUpdate: NoAction, map: "FK_EXAMEN_SECTION")
+  Creneau      Creneau       @relation(fields: [date, start_time, end_time], references: [date, start_time, end_time], onDelete: Cascade, onUpdate: NoAction, map: "FK_EXAMEN_CRENEAU")
+  LocalExamen  LocalExamen[]
+
+  @@id([code_module, code_section, date, start_time, end_time], map: "PK_EXAMEN")
+  @@unique([code_section, date, start_time, end_time], map: "UNIQUE_SECTION_CRENEAU")
+  @@unique([code_section, code_module], map: "UNIQUE_SECTION_MODULE")
+}
+
+model Grade {
+  code_grade           String       @id(map: "PK_GRADE") @db.VarChar(30)
+  nombre_surveillances Int
+  Enseignant           Enseignant[]
+}
+
+model Local {
+  code_local  String        @id(map: "PK_LOCAL") @db.VarChar(10)
+  capacite    Int
+  LocalExamen LocalExamen[]
+  Reservation Reservation[]
+}
+
+model LocalExamen {
+  code_local   String         @db.VarChar(10)
+  code_module  String         @db.VarChar(30)
+  code_section String         @db.VarChar(30)
+  date         DateTime       @db.Date
+  start_time   DateTime       @db.Timestamp(6)
+  end_time     DateTime       @db.Timestamp(6)
+  Local        Local          @relation(fields: [code_local], references: [code_local], onDelete: Cascade, onUpdate: NoAction, map: "FK_LOCAEXAMEN_LOCAL")
+  Examen       Examen         @relation(fields: [code_module, code_section, date, start_time, end_time], references: [code_module, code_section, date, start_time, end_time], onDelete: Cascade, onUpdate: NoAction, map: "FK_LOCALEXAMEN_EXAMEN")
+  Surveillance Surveillance[]
+
+  @@id([code_local, code_module, code_section, date, start_time, end_time], map: "PK_LOCALEXAMEN")
+  @@unique([date, start_time, end_time, code_local], map: "UNIQUE_CRENEAU_LOCAL")
+}
+
+model Module {
+  code_module      String             @id(map: "PK_MODULE") @db.VarChar(30)
+  nom_module       String             @db.VarChar(255)
+  Examen           Examen[]
+  ModuleSpecialite ModuleSpecialite[]
+}
+
+model ModuleSpecialite {
+  code_module     String     @db.VarChar(30)
+  code_specialite String     @db.VarChar(30)
+  anneeEtude      Int
+  semestre        Int
+  fondamental     Boolean
+  Module          Module     @relation(fields: [code_module], references: [code_module], onDelete: Cascade, onUpdate: NoAction, map: "FK_MODULESPECIALITE_MODULE")
+  Specialite      Specialite @relation(fields: [code_specialite], references: [code_specialite], onDelete: Cascade, onUpdate: NoAction, map: "FK_MODULESPECIALITE_SPECIALITE")
+
+  @@id([code_module, code_specialite], map: "PK_MODULESPECIALITE")
+}
+
+model Reservation {
+  date       DateTime @db.Date
+  start_time DateTime @db.Timestamp(6)
+  end_time   DateTime @db.Timestamp(6)
+  code_local String   @db.VarChar(10)
+  disponible Boolean  @default(true)
+  Local      Local    @relation(fields: [code_local], references: [code_local], onDelete: Cascade, onUpdate: NoAction, map: "FK_RESERVATION_LOCAL")
+  Creneau    Creneau  @relation(fields: [date, start_time, end_time], references: [date, start_time, end_time], onDelete: Cascade, onUpdate: NoAction, map: "FK_RESERVATION_CRENEAU")
+
+  @@id([date, start_time, end_time, code_local], map: "PK_RESERVATION")
+}
+
+model Section {
+  code_section    String     @id(map: "PK_SECTION") @db.VarChar(30)
+  nom_section     String     @db.VarChar(1)
+  anneeEtude      Int
+  code_specialite String     @db.VarChar(30)
+  nombre_etudiants Int
+  Specialite      Specialite @relation(fields: [code_specialite], references: [code_specialite], onDelete: Cascade, onUpdate: NoAction, map: "FK_SECTION_SPECIALITE")
+  Examen          Examen[]
+}
+
+model Specialite {
+  code_specialite  String             @id(map: "PK_SPECIALITE") @db.VarChar(30)
+  nom_specialite   String             @db.VarChar(255)
+  code_departement String             @db.VarChar(255)
+  palier           String             @db.VarChar(255)
+  Departement      Departement        @relation(fields: [code_departement], references: [code_departement], onDelete: SetNull, onUpdate: NoAction, map: "FK_SPECIALITE_DEPARTEMENT")
+  ModuleSpecialite ModuleSpecialite[]
+  Section          Section[]
+}
+
+model Surveillance {
+  code_enseignant String      @db.VarChar(30)
+  code_local      String      @db.VarChar(10)
+  code_module     String      @db.VarChar(30)
+  code_section    String      @db.VarChar(30)
+  date            DateTime    @db.Date
+  start_time      DateTime    @db.Timestamp(6)
+  end_time        DateTime    @db.Timestamp(6)
+  Enseignant      Enseignant  @relation(fields: [code_enseignant], references: [code_enseignant], onDelete: Cascade, onUpdate: NoAction, map: "FK_SURVEILLANCE_ENSEINGNANT")
+  LocalExamen     LocalExamen @relation(fields: [code_local, code_module, code_section, date, start_time, end_time], references: [code_local, code_module, code_section, date, start_time, end_time], onDelete: Cascade, onUpdate: NoAction, map: "FK_SURVEILLANCE_LOCALEXAMEN")
+
+  @@id([code_enseignant, code_local, code_module, code_section, date, start_time, end_time], map: "PK_SURVEILLANCE")
+  @@unique([code_enseignant, date, start_time, end_time], map: "UNIQUE_ENSEIGNANT_CRENEAU")
+}
