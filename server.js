@@ -4,8 +4,11 @@ const fs = require('fs');
 const { start } = require('repl');
 const morgan = require('morgan');
 const xlsx = require('xlsx');
+const res = require('express/lib/response');
 const app = express();
 const prisma = new PrismaClient()
+var bodyParser = require('body-parser');
+
 
 
 
@@ -13,11 +16,16 @@ const prisma = new PrismaClient()
 app.use(express.static('public'));
 app.use(express.urlencoded({extended : true}));
 app.use(morgan('dev'));
-app.use(express.json())
+app.use(express.json());
 app.set('view engine' , 'ejs');
 
 
-app.get('' , async (req , res) =>{
+
+
+
+
+
+app.get('/home' , async (req , res) =>{
     
     let master_specialites = await prisma.specialite.findMany({
         where : {
@@ -40,7 +48,7 @@ app.get('' , async (req , res) =>{
    
     console.log(sections);
     
-    return res.render('index' , {
+    return res.render('main' , {
         'licence' : licence_specialites,
         'master' : master_specialites,
         'sections' : sections 
@@ -48,22 +56,210 @@ app.get('' , async (req , res) =>{
 
 });
 
-app.post('/students' , async (req , res) =>{
-    const {id , name} = req.body
-    let student;
-    student = await prisma.student.create({
+
+app.get('/home/:semestre/:section_id' , async (req , res) =>{
+
+
+      let section = await prisma.section.findUnique({
+          where : {
+              code_section : req.params.section_id
+          }
+      });
+
+       
+      let modules_ids = await prisma.moduleSpecialite.findMany({
+          where : {
+             code_specialite : section.code_specialite,
+             anneeEtude : section.anneeEtude,
+             semestre : parseInt(req.params.semestre)
+          },
+          select : {
+            code_module : true,
+         }
+      });
+      let ids = modules_ids.map(a => a.code_module);
+
+
+      let modules_deja_planifier = await prisma.examen.findMany({
+         
+        where : {
+            code_section : section.code_section,  
+        }
+        , 
+         select : {
+             code_module : true,
+         }
+
+
+      });
+
+      let modules_planifier_ids = modules_deja_planifier.map(a => a.code_module)
+     
+      let modules = await prisma.module.findMany({
+         where : {
+             code_module : { in : ids , notIn : modules_planifier_ids },
+         }
+
+      });
+
+      return res.render('planifier' , {
+          'modules' : modules,
+          'section' : section ,
+      });
+
+       
+
+});
+
+
+app.get('/home/:semestre/:section_id/:module_id' , async (req , res) => {
+
+    let section = await prisma.section.findUnique({
+        where : {
+            code_section : req.params.section_id
+        }
+    });
+
+    let module = await prisma.module.findUnique({
+        where : {
+            code_module : req.params.module_id
+        }
+    });
+
+    // verfier si le module est deja planifie encore une fois -- later
+
+    
+    // les creneaux where les salles disponibles:
+
+
+    let creneaux_disponible = await prisma.reservation.findMany({
+        select : {
+            code_creneau : true
+        },
+        where : {
+           disponible : true,
+        }
+    });
+
+    let ids_disponibles = creneaux_disponible.map(element => element.code_creneau);
+
+
+    // les creneaux interdits:
+
+    let creneaux_interdits = await prisma.examen.findMany({
+
+        select : {
+           code_creneau : true
+        },
+        where : {
+            code_section : section.code_section
+        }
+    });
+
+    let ids_interdits = creneaux_interdits.map(element => element.code_creneau);
+    
+
+    let creneaux = await prisma.creneau.findMany({
+        where : {
+           code_creneau : { in : ids_disponibles , notIn : ids_interdits}
+        }
+    });
+
+   return res.render('planifier_module' , {
+       'module' : module,
+        'creneaux' : creneaux
+   })
+
+});
+
+app.post('/home/:semestre/:section_id/:module_id' , async (req , res) =>{
+
+    let section = await prisma.section.findUnique({
+        where : {
+            code_section : req.params.section_id
+        }
+    });
+
+    let module = await prisma.module.findUnique({
+        where : {
+            code_module : req.params.module_id
+        }
+    });
+
+    let exam = await prisma.examen.create({
         data : {
-            id,
-            name
+            code_creneau : parseInt(req.body.creneau),
+            code_module : module.code_module,
+            code_section : section.code_section,
+        }
+    })
+
+    let locaux = req.body.locaux;
+
+    for(let index in locaux){
+
+       let local_disponible = await prisma.reservation.findUnique({
+           select : {
+             disponible : true,
+           },
+           where : {
+            code_creneau_code_local : {
+                code_creneau : parseInt(req.body.creneau),
+                code_local : locaux[index],
+            }
+           }
+       });
+
+
+       if (local_disponible){
+
+            let my_local = await prisma.local.findUnique({
+                where : {
+                    code_local : locaux[index]
+                }
+            });
+
+            let examen_local = await prisma.localExamen.create({
+                    data : {
+                        code_creneau : exam.code_creneau,
+                        code_module  : exam.code_module,
+                        code_section : exam.code_section,
+                        code_local : locaux[index],
+                    }
+                });
         }
     }
-    ).then(() =>{
-       res.json(student)
-   }).catch((error) => {
-       console.log(error)
-   });
+    res.redirect(`/home/${req.params.semestre}/${req.params.section_id}`)
 
 })
+
+
+app.get('/ajax/locaux_disponibles' , async (req , res)  => {
+
+      let reservations_disponible = await prisma.reservation.findMany({
+        select : {
+            code_local : true,
+        },
+        where : {
+            code_creneau : parseInt(req.query.code_creneau),
+            disponible : true,
+        },
+        
+      });
+      let locaux_ids = reservations_disponible.map(element => element.code_local);
+      
+      let locaux = await prisma.reservation.findMany({
+          where : {
+              code_local : {in : locaux_ids}
+          },
+          distinct : ['code_local']
+      });
+      return res.render('chained_drop_downs/locaux.ejs' , {
+          'locaux' : locaux
+      })
+});
+
+
 
 
 app.listen((3000) , ()=>{

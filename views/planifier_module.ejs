@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <title>Planifier</title>
+    <link rel="stylesheet" href="/static/styles/plaexam.css">
+</head>
+<body>
+    <div class="container">
+        <section class="navbare">
+            <div class="top">
+                <ion-icon name="settings-outline"></ion-icon>
+                <h1>Planifier un examen</h1>
+            </div>
+            <div class="buttons">
+                <h3>Menu</h3>
+                <div class="button">
+                    <ion-icon name="apps-outline"></ion-icon>
+                    <p>Dashbord</p>
+                </div>
+                <div class="button">
+                    <ion-icon name="arrow-undo-outline"></ion-icon>
+                    <p>Retour</p>
+                </div>
+            </div>   
+        </section>
+        <section class="menu">
+            <div class="cardModify">
+                <form action="" method="post">
+                    <div class="module">
+                        <h2>Module :</h2>
+                        <select name="module" id="module">
+                            <option value="<%= module.code_module %>"><%= module.code_module  %> </option>
+                        </select>
+                    </div>
+                    <div class="creneau">
+                        <h2>Les créneaux disponibles:</h2>
+                        <select name="creneau" id="creneau">
+                            <option value="empty">---------------</option>
+                            <%  
+                               for(let index in creneaux){%>
+                                <%
+                                var dd = String(creneaux[index].date.getDate()).padStart(2, '0');
+                                var mm = String(creneaux[index].date.getMonth() + 1).padStart(2, '0'); //January is 0!
+                                var yyyy = creneaux[index].date.getFullYear();
+                                let result = dd + '/' + mm + '/' + yyyy;
+                                %>
+                                <option value="<%= creneaux[index].code_creneau %>">  <%= result %>     <%=creneaux[index].start_time.getHours() - 1%>:<%=creneaux[index].start_time.getMinutes()%>:00 - <%=creneaux[index].end_time.getHours() - 1%>:<%=creneaux[index].end_time.getMinutes()%>:00</option>
+                              <%}%> 
+                
+                        </select>
+                    </div>
+                    <div class="salle">
+                        <h2>Les salles disponibles:</h2>
+                        <select name="locaux" id="locaux" multiple>
+                        </select>
+                    </div>
+                    <button type="submit">Terminer</button>
+                </form>
+            </div>
+        </section>
+    </div>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <script>
+        $("#creneau").change(function(){
+           const creneau = $(this).val();
+           if(creneau != 'empty'){
+
+           
+           const url = "/ajax/locaux_disponibles"
+           $.ajax({
+            url:url,
+            method : 'GET' ,
+            data: {
+            'code_creneau':creneau
+            },
+            success:function(data){
+            $("#locaux").html(data);
+            },
+            error:function(error){
+                console.log(error)
+            }
+           })
+        }
+        })    
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap');
+    </style>
+</body>
+</html>

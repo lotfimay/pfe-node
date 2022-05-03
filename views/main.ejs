@@ -32,16 +32,16 @@
                              <div class="Nspeacialite">
                                     <div class="Hspecialite">
                                         <p><%= licence[index].nom_specialite %></p>
-                                        <ion-icon name="caret-down-circle-outline"  @click="showspecialiteM0"></ion-icon>
+                                        <ion-icon name="caret-down-circle-outline"    ></ion-icon>
                                     </div>
-                                    <div class="Palier" :class="showS_M1">
+                                    <div class="Palier" >
                                            <div class="NPalier">
                                                     <ion-icon name="chevron-forward-outline" ></ion-icon>
-                                                    <p>M1</p>
+                                                    <p>L2</p>
                                             </div>
                                             <div class="NPalier">
                                                     <ion-icon name="chevron-forward-outline"></ion-icon>
-                                                    <p>M2</p>
+                                                    <p>L3</p>
                                             </div>
                                     </div>
                                 </div>
@@ -52,18 +52,18 @@
                         <div class="Npalier">
                             <div class="headerB">
                                 <p>Master</p>
-                                <ion-icon name="caret-down-circle-outline" @click="showpalierM"></ion-icon>
+                                <ion-icon name="caret-down-circle-outline" ></ion-icon>
                             </div>
-                            <div class="specialites" :class="showP_M">
+                            <div class="specialites" >
                         <% 
                         for (let index in master){%>
 
                             <div class="Nspeacialite">
                                     <div class="Hspecialite">
                                         <p><%=master[index].nom_specialite%></p>
-                                        <ion-icon name="caret-down-circle-outline" @click="showspecialiteM0"></ion-icon>
+                                        <ion-icon name="caret-down-circle-outline"></ion-icon>
                                     </div>
-                                    <div class="Palier" :class="showS_M1">
+                                    <div class="Palier" >
                                         <div class="NPalier">
                                             <ion-icon name="chevron-forward-outline" ></ion-icon>
                                             <p>M1</p>

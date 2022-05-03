@@ -71,7 +71,7 @@ body{
     flex-direction: column;
     margin-left: 1.5em;
     margin-top: 0.2em;
-    display: none;   
+    display: flex;   
 }
 .navbare .buttons .button .scrollnav .Npalier .specialites .Nspeacialite{
     width: 80%;
@@ -85,7 +85,7 @@ body{
     justify-content: space-between;
 } 
 .navbare .buttons .button .scrollnav .Npalier .specialites .Nspeacialite .Palier{
-    display: none;
+    display: flex;
     flex-direction: column;
     margin-left: 0.2em;
 }
