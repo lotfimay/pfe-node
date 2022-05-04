@@ -33,6 +33,7 @@ model Enseignant {
   telephone_2       String?        @db.VarChar(10)
   code_grade        String         @db.VarChar(30)
   Grade             Grade          @relation(fields: [code_grade], references: [code_grade], onDelete: SetNull, onUpdate: NoAction, map: "FK_ENSEIGNANT_GRADE")
+  ChargeCours       ChargeCours[]
   Surveillance      Surveillance[]
 }
 
@@ -79,6 +80,7 @@ model LocalExamen {
 model Module {
   code_module      String             @id(map: "PK_MODULE") @db.VarChar(30)
   nom_module       String             @db.VarChar(255)
+  ChargeCours      ChargeCours[]
   Examen           Examen[]
   ModuleSpecialite ModuleSpecialite[]
 }
@@ -106,12 +108,13 @@ model Reservation {
 }
 
 model Section {
-  code_section     String     @id(map: "PK_SECTION") @db.VarChar(30)
-  nom_section      String     @db.VarChar(1)
+  code_section     String        @id(map: "PK_SECTION") @db.VarChar(30)
+  nom_section      String        @db.VarChar(1)
   anneeEtude       Int
-  code_specialite  String     @db.VarChar(30)
+  code_specialite  String        @db.VarChar(30)
   nombre_etudiants Int
-  Specialite       Specialite @relation(fields: [code_specialite], references: [code_specialite], onDelete: Cascade, onUpdate: NoAction, map: "FK_SECTION_SPECIALITE")
+  Specialite       Specialite    @relation(fields: [code_specialite], references: [code_specialite], onDelete: Cascade, onUpdate: NoAction, map: "FK_SECTION_SPECIALITE")
+  ChargeCours      ChargeCours[]
   Examen           Examen[]
 }
 
@@ -136,4 +139,16 @@ model Surveillance {
 
   @@id([code_enseignant, code_local, code_module, code_section, code_creneau], map: "PK_SURVEILLANCE")
   @@unique([code_enseignant, code_creneau], map: "UNIQUE_ENSEIGNANT_CRENEAU")
+}
+
+model ChargeCours {
+  code_section    String     @db.VarChar(30)
+  code_module     String     @db.VarChar(30)
+  code_enseignant String     @db.VarChar(30)
+  Enseignant      Enseignant @relation(fields: [code_enseignant], references: [code_enseignant], onDelete: SetNull, onUpdate: NoAction, map: "FK_CHARGECOURS_ENSEIGNANT")
+  Module          Module     @relation(fields: [code_module], references: [code_module], onDelete: Cascade, onUpdate: NoAction, map: "FK_CHARGECOURS_MODULE")
+  Section         Section    @relation(fields: [code_section], references: [code_section], onDelete: Cascade, onUpdate: NoAction, map: "FK_CHARGECOURS_SECTION")
+
+  @@id([code_section, code_module, code_enseignant], map: "PK_CHARGECOURS")
+  @@unique([code_section, code_module], map: "UNIQUE_SECTION_MODULE_CHARGECOURS")
 }
