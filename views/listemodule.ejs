@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <%- include('./partials/header.ejs') %>
+</head>
+<body>
+    <div class="container">
+        <%- include('./partials/navbare.ejs') %>
+        <section class="menu">
+            <div class="menudiv">
+                <div class="search">
+                    <input type="text" placeholder="Rechercher un module">
+                    <div class="status">
+                        <div class="stat">Tout</div>
+                        <div class="stat">Planifier</div>
+                        <div class="stat">Non Planifier</div>
+                    </div>
+                </div>
+                
+                <div class="modules">
+                    <h2>Les modules :</h2>
+                    <div class="cards">
+                       <div class="scroll">
+                        <a href="planexam.html">
+                            <div class="cardM">
+                                <p>1 - Algorithmique</p>
+                                <ion-icon name="add-circle-outline"></ion-icon>
+                            </div>
+                        </a>
+                       </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap');
+    </style>
+</body>
+</html>

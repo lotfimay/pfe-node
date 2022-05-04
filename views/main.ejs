@@ -1,90 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Planifier</title>
-    <link rel="stylesheet" href="/static/styles/main.css">
-    <script src="https://unpkg.com/vue@next" defer></script>
-    <script src="/static/js/app.js'" defer></script>
+    <%- include('./partials/header.ejs') %>
 </head>
 <body>
     <div class="container">
-        <section class="navbare" id="navbare">
-            <div class="top">
-                <ion-icon name="settings-outline"></ion-icon>
-                <h1>Planifier un examen</h1>
-            </div>
-            <div class="buttons">
-                <h3>Palier</h3>
-                <div class="button">
-                    <div class="scrollnav">
-                        <div class="Npalier">
-                            <div class="headerB">
-                                <p>License</p>
-                                <ion-icon name="caret-down-circle-outline" @click="showpalierL"></ion-icon>
-                            </div>
-                            <div class="specialites" :class="showP_L">
-                        <% 
-                        for (let index in licence){%>
-        
-                             <div class="Nspeacialite">
-                                    <div class="Hspecialite">
-                                        <p><%= licence[index].nom_specialite %></p>
-                                        <ion-icon name="caret-down-circle-outline"    ></ion-icon>
-                                    </div>
-                                    <div class="Palier" >
-                                           <div class="NPalier">
-                                                    <ion-icon name="chevron-forward-outline" ></ion-icon>
-                                                    <p>L2</p>
-                                            </div>
-                                            <div class="NPalier">
-                                                    <ion-icon name="chevron-forward-outline"></ion-icon>
-                                                    <p>L3</p>
-                                            </div>
-                                    </div>
-                                </div>
-        
-                                <%}%> 
-                            </div>
-                        </div>
-                        <div class="Npalier">
-                            <div class="headerB">
-                                <p>Master</p>
-                                <ion-icon name="caret-down-circle-outline" ></ion-icon>
-                            </div>
-                            <div class="specialites" >
-                        <% 
-                        for (let index in master){%>
-
-                            <div class="Nspeacialite">
-                                    <div class="Hspecialite">
-                                        <p><%=master[index].nom_specialite%></p>
-                                        <ion-icon name="caret-down-circle-outline"></ion-icon>
-                                    </div>
-                                    <div class="Palier" >
-                                        <div class="NPalier">
-                                            <ion-icon name="chevron-forward-outline" ></ion-icon>
-                                            <p>M1</p>
-                                        </div>
-                                        <div class="NPalier">
-                                            <ion-icon name="chevron-forward-outline"></ion-icon>
-                                            <p>M2</p>
-                                        </div>
-                                    </div>
-                                </div>
-
-                        <%}%> 
-
-                            
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-            </div>
-        </section>    
+        <%- include('./partials/navbare.ejs') %>
         <section class="menu">
             
         </section>

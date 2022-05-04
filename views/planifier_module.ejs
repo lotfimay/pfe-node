@@ -1,32 +1,11 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <title>Planifier</title>
-    <link rel="stylesheet" href="/static/styles/plaexam.css">
+    <%- include('./partials/header.ejs') %>
 </head>
 <body>
     <div class="container">
-        <section class="navbare">
-            <div class="top">
-                <ion-icon name="settings-outline"></ion-icon>
-                <h1>Planifier un examen</h1>
-            </div>
-            <div class="buttons">
-                <h3>Menu</h3>
-                <div class="button">
-                    <ion-icon name="apps-outline"></ion-icon>
-                    <p>Dashbord</p>
-                </div>
-                <div class="button">
-                    <ion-icon name="arrow-undo-outline"></ion-icon>
-                    <p>Retour</p>
-                </div>
-            </div>   
-        </section>
+        <%- include('./partials/navbare.ejs') %>
         <section class="menu">
             <div class="cardModify">
                 <form action="" method="post">

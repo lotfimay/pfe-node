@@ -12,7 +12,6 @@ var bodyParser = require('body-parser');
 
 
 
-
 app.use(express.static('public'));
 app.use(express.urlencoded({extended : true}));
 app.use(morgan('dev'));
@@ -25,8 +24,19 @@ app.set('view engine' , 'ejs');
 
 
 
-app.get('/home' , async (req , res) =>{
-    
+app.get('/' , async (req , res) =>{ 
+    return res.render('main' , {
+    });  
+
+});
+
+app.get('/listemodule' , async (req , res) =>{ 
+    return res.render('listemodule' , {
+    });  
+
+});
+
+app.get('/Planifier', async(req, res) => {
     let master_specialites = await prisma.specialite.findMany({
         where : {
             palier : 'MASTER'
@@ -47,17 +57,14 @@ app.get('/home' , async (req , res) =>{
 
    
     console.log(sections);
-    
-    return res.render('main' , {
+    return res.render('planifier' , {
         'licence' : licence_specialites,
         'master' : master_specialites,
         'sections' : sections 
-    });  
+    }); 
+})
 
-});
-
-
-app.get('/home/:semestre/:section_id' , async (req , res) =>{
+app.get('/:semestre/:section_id' , async (req , res) =>{
 
 
       let section = await prisma.section.findUnique({
@@ -112,7 +119,7 @@ app.get('/home/:semestre/:section_id' , async (req , res) =>{
 });
 
 
-app.get('/home/:semestre/:section_id/:module_id' , async (req , res) => {
+app.get('/:semestre/:section_id/:module_id' , async (req , res) => {
 
     let section = await prisma.section.findUnique({
         where : {
@@ -172,7 +179,7 @@ app.get('/home/:semestre/:section_id/:module_id' , async (req , res) => {
 
 });
 
-app.post('/home/:semestre/:section_id/:module_id' , async (req , res) =>{
+app.post('/:semestre/:section_id/:module_id' , async (req , res) =>{
 
     let section = await prisma.section.findUnique({
         where : {
