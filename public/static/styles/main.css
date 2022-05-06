@@ -79,10 +79,9 @@ body{
     display: flex;
     flex-direction: column;
     width: 80%;
-    height: 100%;
     background-color: whitesmoke;
     justify-content: center;
-    align-items: center;
+    /* align-items: center;  */
 }
 .menu .box{
     width: 70%;
@@ -159,6 +158,7 @@ a{
     display: flex;
     margin-left: 0.2em;
     color: black;
+    margin-top: 4.4em;
 }
 .menu .modules .cards{
     display: flex;
@@ -172,13 +172,13 @@ a{
     height: 80vh;
     overflow-y: scroll;
 }
-::-webkit-scrollbar{
+.menu .modules .cards .scroll::-webkit-scrollbar{
     width: 0.5em;
 }
-::-webkit-scrollbar-track{
+.menu .modules .cards .scroll::-webkit-scrollbar-track{
     background: whitesmoke;
 }
-::-webkit-scrollbar-thumb{
+.menu .modules .cards .scroll::-webkit-scrollbar-thumb{
     background-color: hsl(140 42% 42% / 0.5);
     border-radius: 20vw;
 }
@@ -202,6 +202,154 @@ a{
 }
 .menu .modules .cards .cardM p{
     color: whitesmoke;
+}
+a{
+    text-decoration: none;
+}
+
+.menu .cardModify{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border: 2px solid #1D6F42;
+    width: 40%;
+    border-radius: 20px;
+    padding-bottom: 1em;
+    background-color: white;
+}
+.menu .cardModify h2{
+    font-size: 25px;
+    font-weight: 500;
+}
+.menu .cardModify .salle .scroll .checkbox{
+    display: flex;
+    flex-direction: column;
+}
+.menu .cardModify .salle .scroll .checkbox .label{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.menu .cardModify .salle .scroll .checkbox .label label{
+    font-size: 15px;
+    font-weight: 500;
+}
+.menu .cardModify .salle .scroll{
+    overflow-y: scroll;
+    height: 20vh;
+    border: 1px solid #1D6F42;
+    border-radius: 10px;
+}
+.menu .cardModify button{
+    text-decoration: none;
+    background-color: #1D6F42;
+    color: whitesmoke;
+    height: 5vh;
+    width: 100%;
+    border: 1px solid #1D6F42;
+    border-radius: 10px;
+    margin-top: 1em;
+    cursor: pointer;
+}
+.menu .cardModify .salle .scroll::-webkit-scrollbar{
+    width: 0.8em;
+}
+.menu .cardModify .salle .scroll::-webkit-scrollbar-track{
+    background: whitesmoke;
+    border-right: 1px solid #1D6F42;
+    border-radius: 10px;
+
+}
+.menu .cardModify .salle .scroll::-webkit-scrollbar-thumb{
+    background-color: hsl(140 42% 42% / 0.5);
+    border-radius: 10px;
+    border: 1px solid #1D6F42;
+}
+.menu .cardModify .card select{
+    width: 20vw;
+    color: black;
+    border-radius: 5px;
+    border: 2px solid #1D6F42;
+    display: flex;
+    flex-direction: column;
+}
+.menu .cardModify .card select:focus{
+    border: 2px solid #1D6F42;
+    outline: none;
+}
+.menu .table{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+}
+.menu .table .print {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+}
+.menu .table .print .thead{
+    display: flex;
+    flex-direction: row;
+    border: 2px solid #1D6F42;
+    justify-content: space-between;
+    width: 60%;
+    height: 5vh;
+}
+.menu .table .print .thead.top{
+    background-color: #D3D3D3;
+}
+.menu .table .print .thead.two{
+    border-top: 2px solid white;
+}
+.menu .table .print .thead .box-table.one{
+    border-left: 2px solid #D3D3D3 !important;
+}
+.menu .table .print .thead .box-table{
+    border-left: 2px solid #1D6F42;
+    text-align: center;
+    font-size: 10px;
+    display: flex;
+    height: 100%;
+    width: 100%;
+    justify-content: center;
+    align-items: center;
+}
+.menu .table .print .title{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 60%;
+}
+.menu .table .print .title .info{
+    display: flex;
+    flex-direction: row;   
+}
+.menu .table .print .title .info .green{
+    color: #1D6F42;
+    margin-right: 0.2em;
+}
+.menu .table .generate{
+    display: flex;
+    width: 60%;
+    margin-top: 1em;
+}
+.menu .table .generate button{
+    background-color: #1D6F42;
+    height: 6vh;
+    width: 100%;
+    border-radius: 10px;
+    color: whitesmoke;
+    font-weight: 600;
+    border: 1px solid #1D6F42;
+    cursor: pointer;
+    font-size: 15px;
+    font-family: 'Poppins';
+    text-transform: uppercase;
 }
 a{
     text-decoration: none;

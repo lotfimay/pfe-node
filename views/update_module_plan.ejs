@@ -1,0 +1,95 @@
+<%- include('./partials/header.ejs') %> 
+<body>
+    <div class="container">
+        <%- include('./partials/navebar.ejs') %>
+        <section class="menu">
+            <div class="cardModify">
+                <form action="" method="post">
+                    <div class="module">
+                        <h2>Module :</h2>
+                        <select name="module" id="module">
+                            <option value="<%= module.code_module %>"><%= module.code_module  %> </option>
+                        </select>
+                    </div>
+                    <div class="creneau">
+                        <h2>Les créneaux disponibles:</h2>
+                        <select name="creneau" id="creneau">
+                            <%
+                            var dd = String(creneau.date.getDate()).padStart(2, '0');
+                            var mm = String(creneau.date.getMonth() + 1).padStart(2, '0'); //January is 0!
+                            var yyyy = creneau.date.getFullYear();
+                            let result = dd + '/' + mm + '/' + yyyy;
+                            %>
+                                <option value="<%= creneau.code_creneau %>">  <%= result %>     <%=creneau.start_time.getHours() - 1%>:<%=creneau.start_time.getMinutes()%>:00 - <%=creneau.end_time.getHours() - 1%>:<%=creneau.end_time.getMinutes()%>:00</option>
+                                <%  
+                                for(let index in creneaux){%>
+                                 <%
+                                 var dd = String(creneaux[index].date.getDate()).padStart(2, '0');
+                                 var mm = String(creneaux[index].date.getMonth() + 1).padStart(2, '0'); //January is 0!
+                                 var yyyy = creneaux[index].date.getFullYear();
+                                 let result = dd + '/' + mm + '/' + yyyy;
+                                 %>
+                                 <option value="<%= creneaux[index].code_creneau %>">  <%= result %>     <%=creneaux[index].start_time.getHours() - 1%>:<%=creneaux[index].start_time.getMinutes()%>:00 - <%=creneaux[index].end_time.getHours() - 1%>:<%=creneaux[index].end_time.getMinutes()%>:00</option>
+                               <%}%> 
+                        </select>
+                    </div>
+                    <div class="salle">
+                        <h2>Les salles disponibles:</h2>
+                        <div class="scroll">
+                            <div class="checkbox" id="locaux">
+                                <% 
+                                for(let index in locaux){%>
+                                    <div class="label">
+                                        <label for="room"><%=locaux[index].code_local%></label>
+                                        <input type="checkbox" name="local" id="local" value="<%=locaux[index].code_local%>" checked>  
+                                    </div>
+                                <%}%> 
+                                <%
+                                  for(let index in autrelocaux){%>
+                                    <div class="label">
+                                        <label for="room"><%=autrelocaux[index].code_local%></label>
+                                        <input type="checkbox" name="local" id="local" value="<%=autrelocaux[index].code_local%>">  
+                                    </div>
+                                  <%}%>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit">Modifier</button>
+                </form>
+            </div>
+        </section>
+    </div>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <script>
+        $("#creneau").change(function(){
+           const creneau = $(this).val();
+           const my_module = $("#module").val();
+           if(creneau != 'empty'){
+
+           
+           const url = "/ajax/update_planification"
+           $.ajax({
+            url:url,
+            method : 'GET' ,
+            data: {
+                'code_creneau':creneau,
+                'section' : 'L3ISILA',
+                'module' : my_module,
+            },
+            success:function(data){
+            $("#locaux").html(data);
+            },
+            error:function(error){
+                console.log(error)
+            }
+           })
+        }
+        })    
+
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap');
+    </style>
+</body>
+</html>

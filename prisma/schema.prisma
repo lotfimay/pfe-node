@@ -70,7 +70,7 @@ model LocalExamen {
   code_section String         @db.VarChar(30)
   code_creneau BigInt
   Local        Local          @relation(fields: [code_local], references: [code_local], onDelete: Cascade, onUpdate: NoAction, map: "FK_LOCAEXAMEN_LOCAL")
-  Examen       Examen         @relation(fields: [code_module, code_section, code_creneau], references: [code_module, code_section, code_creneau], onDelete: Cascade, onUpdate: NoAction, map: "FK_LOCALEXAMEN_EXAMEN")
+  Examen       Examen         @relation(fields: [code_module, code_section, code_creneau], references: [code_module, code_section, code_creneau], onDelete: Cascade, map: "FK_LOCALEXAMEN_EXAMEN")
   Surveillance Surveillance[]
 
   @@id([code_local, code_module, code_section, code_creneau], map: "PK_LOCALEXAMEN")

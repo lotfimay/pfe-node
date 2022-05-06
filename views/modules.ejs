@@ -3,28 +3,23 @@
     <div class="container">
         <%- include('./partials/navebar.ejs') %>
         <section class="menu">
-            <div class="search">
-                <input type="text" placeholder="Rechercher un module">
-            </div>
             <div class="modules">
                 <h2>Les modules :</h2>
                 <div class="cards">
                    <div class="scroll">
                        <% 
-
-                       for(let index in modules){%>
-                        
-                        <a href="planexam.html">
+                       for(let index in modules_planifiees){%>
+                        <a href="/planifier/<%=semestre%>/<%=section%>/<%= modules_planifiees[index].code_module%>/update">
                             <div class="cardM">
-                                    <p1><%= modules[index].nom_module%></p1>   
+                                    <p><%= modules_planifiees[index].nom_module%></p>   
                                     <ion-icon name="add-circle-outline"></ion-icon>
                             </div>
-                       </a>
-                      
+                       </a> 
                     <%}%>
                    </div>
                 </div>
             </div>
+
         </section>
     </div>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>

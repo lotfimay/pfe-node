@@ -1,0 +1,17 @@
+<% 
+  for(index in locaux_existent){%>
+    <div class="label">
+          <label for="room"><%=locaux_existent[index].code_local%></label>
+          <input type="checkbox" name="local" id="local" value="<%=locaux_existent[index].code_local%>" checked>  
+    </div>    
+  <%}
+%>
+
+<%
+
+for(index in autre_locaux){%>
+    <div class="label">
+          <label for="room"><%=autre_locaux[index].code_local%></label>
+          <input type="checkbox" name="local" id="local" value="<%=autre_locaux[index].code_local%>" >  
+    </div>    
+<%}%> 

@@ -4,3 +4,4 @@ node_modules
 api.rest
 test.xlsx
 prisma
+~$test.xlsx
