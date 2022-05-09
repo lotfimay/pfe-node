@@ -81,7 +81,7 @@ body{
     width: 80%;
     background-color: whitesmoke;
     justify-content: center;
-    /* align-items: center;  */
+    align-items: center;  
 }
 .menu .box{
     width: 70%;

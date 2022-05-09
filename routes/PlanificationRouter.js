@@ -110,18 +110,18 @@ router.get('/:semestre/:section_id/:module_id' , async (req , res) => {
 
     // verfier si le module est deja planifie encore une fois -- later
 
-    let verify = await prisma.examen.findMany({
-        where : {
-           code_section : req.params.section_id,
-           code_module : req.params.module_id,
-        }
-    });
+    // let verify = await prisma.examen.findMany({
+    //     where : {
+    //        code_section : req.params.section_id,
+    //        code_module : req.params.module_id,
+    //     }
+    // });
 
-    console.log(verify);
+    // console.log(verify);
 
-    if(verify){
-        res.redirect(`/planifier/${req.params.semestre}/${req.params.section_id}/${req.params.module_id}/update`);
-    }
+    // if(verify){
+    //     res.redirect(`/planifier/${req.params.semestre}/${req.params.section_id}/${req.params.module_id}/update`);
+    // }
 
     
     // les creneaux where les salles disponibles:
@@ -134,6 +134,7 @@ router.get('/:semestre/:section_id/:module_id' , async (req , res) => {
         where : {
            disponible : true,
         },
+        distinct : ['code_creneau']
     });
 
     console.log("creneaux disponibles: " , creneaux_disponible);
@@ -271,27 +272,34 @@ router.get('/:semestre/:section_id/:module_id/update' , async (req , res) =>{
             code_section : req.params.section_id,
         },
     });
+    console.log(section.code_section);
 
-    let module = await prisma.module.findUnique({
+    let my_module = await prisma.module.findUnique({
         where : {
           code_module : req.params.module_id
         },
 
     });
 
+    console.log(my_module.code_module);
+
     // récuperer le creneau deja sélectionner
+
 
     let code_creneau = await prisma.examen.findUnique({
          where : {
               code_section_code_module : {
                   code_section : section.code_section,
-                  code_module : module.code_module
+                  code_module : module.code_module,
               }
          },
-         select : {
-            code_creneau : true,
-         }
     });
+    
+    console.log(section);
+    console.log(my_module);
+
+
+    console.log(code_creneau);
     
     let creneau = await prisma.creneau.findUnique({
         where : {
@@ -435,6 +443,12 @@ router.post('/:semestre/:section_id/:module_id/update' , async (req,res) => {
   }
 
     res.redirect(`/planifier/${req.params.semestre}/${req.params.section_id}`);
+});
+
+router.get('/test', async (req , res) =>{
+       
+
+    return res.json('done');
 });
 
 module.exports = router;

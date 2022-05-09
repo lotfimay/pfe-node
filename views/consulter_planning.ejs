@@ -8,11 +8,11 @@
                     <div class="title">
                         <div class="info">
                             <h1 class="green">Palier:</h1>
-                            <h1>L2</h1>
+                            <h1><%= niveau%></h1>
                         </div>
                         <div class="info">
                             <h1 class="green">Section: </h1>
-                            <h1>ACAB_B</h1>
+                            <h1><%=section.code_specialite%>_<%=section.nom_section%></h1>
                         </div>
                     </div>
                     <div class="thead top">
@@ -20,127 +20,39 @@
                             <h2>Date</h2>
                         </div>
                         <div class="box-table">
-                            <h2>Créneau</h2>
+                            <h2>Horaire</h2>
                         </div>
                         <div class="box-table">
                             <h2>Module</h2>
                         </div>
                         <div class="box-table">
-                            <h2>Local</h2>
+                            <h2>Salle</h2>
                         </div>
                     </div>
+                    <% 
+                      for(let index in exams){%>
+                    
+                        <%
+                                var dd = String(exams[index].Creneau.date.getDate()).padStart(2, '0');
+                                var mm = String(exams[index].Creneau.date.getMonth() + 1).padStart(2, '0'); //January is 0!
+                                var yyyy = exams[index].Creneau.date.getFullYear();
+                                let result = dd + '/' + mm + '/' + yyyy;
+                        %>
                     <div class="thead two">
                         <div class="box-table one">
-                            <h2>2022-15-02</h2>
+                            <h2><%= result %></h2>
                         </div>
                         <div class="box-table">
-                            <h2>10:15</h2>
+                            <h2><%=exams[index].Creneau.start_time.getHours() - 1%>:<%=exams[index].Creneau.start_time.getMinutes()%>:00</h2>
                         </div>
                         <div class="box-table">
-                            <h2>ALGO</h2>
+                            <h2><%=exams[index].code_module%></h2>
                         </div>
                         <div class="box-table">
-                            <h2>313+151+120</h2>
+                            <h2><%=exams[index].locaux_presentation%></h2>
                         </div>
                     </div>
-                    <div class="thead two">
-                        <div class="box-table one">
-                            <h2>2022-15-02</h2>
-                        </div>
-                        <div class="box-table">
-                            <h2>10:15</h2>
-                        </div>
-                        <div class="box-table">
-                            <h2>ALGO</h2>
-                        </div>
-                        <div class="box-table">
-                            <h2>313</h2>
-                        </div>
-                    </div>
-                    <div class="thead two">
-                        <div class="box-table one">
-                            <h2>2022-15-02</h2>
-                        </div>
-                        <div class="box-table">
-                            <h2>10:15</h2>
-                        </div>
-                        <div class="box-table">
-                            <h2>ALGO</h2>
-                        </div>
-                        <div class="box-table">
-                            <h2>313</h2>
-                        </div>
-                    </div>
-                    <div class="thead two">
-                        <div class="box-table one">
-                            <h2>2022-15-02</h2>
-                        </div>
-                        <div class="box-table">
-                            <h2>10:15</h2>
-                        </div>
-                        <div class="box-table">
-                            <h2>ALGO</h2>
-                        </div>
-                        <div class="box-table">
-                            <h2>313</h2>
-                        </div>
-                    </div>
-                    <div class="thead two">
-                        <div class="box-table one">
-                            <h2>2022-15-02</h2>
-                        </div>
-                        <div class="box-table">
-                            <h2>10:15</h2>
-                        </div>
-                        <div class="box-table">
-                            <h2>ALGO</h2>
-                        </div>
-                        <div class="box-table">
-                            <h2>313</h2>
-                        </div>
-                    </div>
-                    <div class="thead two">
-                        <div class="box-table one">
-                            <h2>2022-15-02</h2>
-                        </div>
-                        <div class="box-table">
-                            <h2>10:15</h2>
-                        </div>
-                        <div class="box-table">
-                            <h2>ALGO</h2>
-                        </div>
-                        <div class="box-table">
-                            <h2>313</h2>
-                        </div>
-                    </div>
-                    <div class="thead two">
-                        <div class="box-table one">
-                            <h2>2022-15-02</h2>
-                        </div>
-                        <div class="box-table">
-                            <h2>10:15</h2>
-                        </div>
-                        <div class="box-table">
-                            <h2>ALGO</h2>
-                        </div>
-                        <div class="box-table">
-                            <h2>313</h2>
-                        </div>
-                    </div>
-                    <div class="thead two">
-                        <div class="box-table one">
-                            <h2>2022-15-02</h2>
-                        </div>
-                        <div class="box-table">
-                            <h2>10:15</h2>
-                        </div>
-                        <div class="box-table">
-                            <h2>ALGO</h2>
-                        </div>
-                        <div class="box-table">
-                            <h2>313</h2>
-                        </div>
-                    </div>
+                <%}%> 
                 </div>
                 <div class="generate">
                     <button onclick="generatePDF()" id="buttongenerer">Générer</button>

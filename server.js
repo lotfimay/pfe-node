@@ -12,11 +12,6 @@ const planificationRouter = require('./routes/PlanificationRouter');
 const ajaxRouter = require('./routes/AjaxRouter');
 
 
-
-
-
-
-
 app.use(express.static('public'));
 app.use(express.urlencoded({extended : true}));
 app.use(morgan('dev'));
@@ -24,7 +19,40 @@ app.use(express.json());
 app.set('view engine' , 'ejs');
 
 
+app.get('/surveillance' , (req , res) => {
+    return res.render('surveillance');
+});
 
+app.get('/surveillance/:semestre_id/:section_id/:module_id' , async (req , res) =>{
+
+    let locaux = await prisma.localExamen.findMany({
+        where : {
+            code_section : req.params.section_id,
+            code_module : req.params.module_id,
+        },
+        select : {
+            Local : {
+                select : {
+                    code_local : true,
+                    capacite : true,
+                }
+            }
+        }
+    });
+    console.log(locaux);
+    return res.render('locaux' , {
+        'locaux' : locaux,
+        'semestre' : req.params.semestre_id,
+        'section' : req.params.section_id,
+        'module' : req.params.module_id,
+    });
+
+
+});
+
+app.get('/surveillance/:semestre_id/:section_id/:module_id/:local_id' , async (req , res)=>{
+  return res.render('affecter_surveillants');
+});
 // ---------- staaaart ajaaaaaaaaaax ------------
 app.use('/ajax' , ajaxRouter)
 
@@ -34,14 +62,55 @@ app.get('/' , async (req , res) =>{
     return res.render('main');  
 });
 
-app.get('/consulter/:section_id' , async(req , res) => {
+
+
+app.get('/consulter' , async (req , res) =>{
+    res.render('consulter');
+})
+
+app.get('/consulter/:semestre/:section_id' , async(req , res) => {
 
     let exams = await prisma.examen.findMany({
-       where : {
-           code_section : req.params.section_id
-       },
+        where : {
+            code_section : req.params.section_id,
+        },
+        select : {
+            code_section : true,
+            code_module : true,
+            code_creneau : true,
+            Creneau : {
+                select : {
+                   date : true,
+                   start_time : true,
+                   end_time : true,
+                }
+            },
+            Section : {
+                select : {
+                    anneeEtude : true,
+                    code_specialite : true,
+                    nom_section : true,
+                }
+            }
+        }
     });
-    console.log(exams);
+
+    let section = await prisma.section.findUnique({
+        where : {
+            code_section : (req.params.section_id),
+        }
+    });
+
+    /// need to be fixed later
+    let niveau = '';
+    switch (section.anneeEtude){
+            case 2 : niveau = 'L2';break;
+            case 3: niveau = 'L3';break;
+            case 4: niveau = 'M1';break;
+            case 5: niveau = 'M2';break;
+    }
+    
+   
     for(let index in exams){
         let locaux = await prisma.localExamen.findMany({
              
@@ -61,10 +130,22 @@ app.get('/consulter/:section_id' , async(req , res) => {
         }
     }
 
+    for(let index in exams){
+        let result = '';
+        for(let j in exams[index].locaux){
+         if(j < exams[index].locaux.length - 1)
+            result = result + exams[index].locaux[j]+'+'
+         else result = result + exams[index].locaux[j];
+        }
+        exams[index].locaux_presentation = result;
+    }
     console.log(exams);
-    return res.render('consulter_planning');
-})
-
+    return res.render('consulter_planning' , {
+        'exams' : exams,
+        'niveau' : niveau,
+        'section' : section
+    });
+});
 
 
 // ------------------- start planification --------------------------

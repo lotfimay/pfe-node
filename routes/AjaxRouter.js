@@ -169,10 +169,11 @@ router.get('/specialites_par__palier', async (req , res) =>{
 });
 
 
-router.get('/ajax/sections_par_niveau' , async (req , res) =>{
+router.get('/sections_par_niveau' , async (req , res) =>{
 
     console.log(req.query.code_specialite);
-    console.log(req.query.niveau)
+    console.log(req.query.niveau);
+
 
     let sections = await prisma.section.findMany({
         where : {
@@ -186,6 +187,49 @@ router.get('/ajax/sections_par_niveau' , async (req , res) =>{
     return res.render('chained_drop_downs/sections' , {
         'sections' : sections
     });
+});
+
+router.get('/modules__par__section' , async (req , res) => {
+
+    console.log(req.query.code_section);
+      
+     let modules = await prisma.examen.findMany({
+        where : {
+            code_section : req.query.code_section,
+        }
+        , 
+        select : {
+             Module : {
+                 select :  {
+                     code_module : true,
+                     nom_module : true,
+                 }
+             },
+             Creneau : {
+                 select :{
+                     date : true,
+                     start_time : true,
+                     end_time : true,
+                 }
+             },
+             LocalExamen : {
+                 select : {
+                     Local : {
+                         select : {
+                             code_local : true,
+                         }
+                     }
+                 }
+             }
+         }
+     });
+
+     return res.render('chained_drop_downs/modules' , {
+         'modules' : modules
+     });
+      
+
+
 });
 
 

@@ -41,6 +41,12 @@
                             <option value="empty">---------------</option>
                         </select>
                     </div>
+                    <div class="insidebox sections">
+                        <p>Choisit le module :</p>
+                        <select name="module" id="module">
+                            <option value="empty">---------------</option>
+                        </select>
+                    </div>
                     <div class="button">
                         <button id="confirm">Confirmer</button>
                     </div>
@@ -91,6 +97,21 @@
                },
                success : function(data){
                       $("#section").html(data);
+                      const section  = $("#section").val();
+                      const url = '/ajax/modules__par__section'
+                        $.ajax({
+                            url :url,
+                            data : {
+                            'code_section' : section
+                            },
+                            success : function(data){
+                                    $("#module").html(data);
+                            },
+                            error : function(err){
+                                    console.log(err);
+                            }
+                        });
+
                },
                error : function(error){
                    console.log(error)
@@ -114,13 +135,45 @@
             },
             success:function(data){
             $("#section").html(data);
+                 const section  = $("#section").val();
+                 const second_url = '/ajax/modules__par__section'
+                $.ajax({
+                    url :second_url,
+                    data : {
+                        'code_section' : section
+                    },
+                    success : function(data){
+                        $("#module").html(data);
+                    },
+                    error : function(err){
+                        console.log(err);
+                    }
+                })
             },
             error:function(error){
                 console.log(error)
             }
            })
+
         });
-        
+        $("#section").change(function(){
+            const section  = $("#section").val();
+            const url = '/ajax/modules__par__section'
+            $.ajax({
+                url :url,
+                data : {
+                    'code_section' : section
+                },
+                success : function(data){
+                    $("#module").html(data);
+                },
+                error : function(err){
+                     console.log(err);
+                }
+            })
+            
+        })
+
         document.getElementById('confirm').addEventListener('click' , () =>{
 
 
@@ -129,7 +182,8 @@
 
             const semestre = $("#semestre").val();
             const section = $("#section").val();
-            window.location.href = `/planifier/${semestre}/${section}`
+            const module = $("#module").val();
+            window.location.href = `/surveillance/${semestre}/${section}/${module}`
     
 
         });

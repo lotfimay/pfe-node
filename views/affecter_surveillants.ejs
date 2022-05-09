@@ -1,0 +1,210 @@
+<%- include('./partials/header.ejs') %>
+<body>
+    <div class="container">
+        <%- include('./partials/navebar.ejs') %>
+        <section class="menu">
+            <div class="box">
+                    <div class="insidebox sections">
+                        <p>Le module :</p>
+                        <select name="section" id="section">
+                            <option value="empty">---------------</option>
+                        </select>
+                    </div>
+                    <div class="insidebox sections">
+                        <p>Le creneau :</p>
+                        <select name="module" id="module">
+                            <option value="empty">---------------</option>
+                        </select>
+                    </div>
+                    <div class="insidebox sections">
+                        <p>La salle :</p>
+                        <select name="module" id="module">
+                            <option value="empty">---------------</option>
+                        </select>
+                    </div>
+                    <div class="salle">
+                        <h2>Les salles disponibles:</h2>                           
+                            <div class="scroll">
+                                <div class="checkbox">
+                                    <div class="label">
+                                        <label for="room">223</label>
+                                        <input type="checkbox" name="" id="room">  
+                                    </div>
+                                    <div class="label">
+                                        <label for="room">223</label>
+                                        <input type="checkbox" name="" id="room">  
+                                    </div>
+                                    <div class="label">
+                                        <label for="room">223</label>
+                                        <input type="checkbox" name="" id="room">  
+                                    </div>
+                                    <div class="label">
+                                        <label for="room">223</label>
+                                        <input type="checkbox" name="" id="room">  
+                                    </div>
+                                    <div class="label">
+                                        <label for="room">223</label>
+                                        <input type="checkbox" name="" id="room">  
+                                    </div>
+                                    <div class="label">
+                                        <label for="room">223</label>
+                                        <input type="checkbox" name="" id="room">  
+                                    </div>
+                                    <div class="label">
+                                        <label for="room">223</label>
+                                        <input type="checkbox" name="" id="room">  
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+                    <div class="button">
+                        <button id="confirm">Confirmer</button>
+                    </div>
+            </div>
+        </section>
+
+       
+
+    </div>
+    
+    <script>
+        $("#palier").change(function(){
+           const palier = $(this).val();
+           let flag = false;
+           if(palier == 'LICENCE'){
+            
+            $("#palier").html(
+               '<option value="LICENCE">License</option><option value="MASTER">Master</option>'
+           ); 
+           flag = true
+           }
+           else{
+            $("#palier").html(
+               '<option value="MASTER">Master</option><option value="LICENCE">License</option>'
+           );
+           }
+           const url = "/ajax/specialites_par__palier"
+           $.ajax({
+            url:url,
+            data:{
+            'palier':palier
+            },
+            success:function(data){
+            $("#specialite").html(data);
+              if(flag){
+                 $("#niveau").html('<option value=\"2\">L2</option><option value=\"3\">L3</option>');
+              }
+             else{
+                $("#niveau").html('<option value="4">M1</option><option value="5">M2</option>');
+             }
+             const specialite = $("#specialite").val();
+             const niveau = $("#niveau").val();
+             $.ajax({
+               url : '/ajax/sections_par_niveau',
+               data : {
+               'code_specialite' : specialite,
+               'niveau' : niveau,
+               },
+               success : function(data){
+                      $("#section").html(data);
+                      const section  = $("#section").val();
+                      const url = '/ajax/modules__par__section'
+                        $.ajax({
+                            url :url,
+                            data : {
+                            'code_section' : section
+                            },
+                            success : function(data){
+                                    $("#module").html(data);
+                            },
+                            error : function(err){
+                                    console.log(err);
+                            }
+                        });
+
+               },
+               error : function(error){
+                   console.log(error)
+               }
+             });
+            },
+            error:function(error){
+                console.log(error)
+            }
+           })
+        });       
+        $("#niveau").change(function(){
+            let val = $(this).val();
+            let specialite = $("#specialite").val();
+            const url = "/ajax/sections_par_niveau"
+            $.ajax({
+            url:url,
+            data:{
+            'code_specialite':specialite,
+            'niveau' : val
+            },
+            success:function(data){
+            $("#section").html(data);
+                 const section  = $("#section").val();
+                 const second_url = '/ajax/modules__par__section'
+                $.ajax({
+                    url :second_url,
+                    data : {
+                        'code_section' : section
+                    },
+                    success : function(data){
+                        $("#module").html(data);
+                    },
+                    error : function(err){
+                        console.log(err);
+                    }
+                })
+            },
+            error:function(error){
+                console.log(error)
+            }
+           })
+
+        });
+        $("#section").change(function(){
+            const section  = $("#section").val();
+            const url = '/ajax/modules__par__section'
+            $.ajax({
+                url :url,
+                data : {
+                    'code_section' : section
+                },
+                success : function(data){
+                    $("#module").html(data);
+                },
+                error : function(err){
+                     console.log(err);
+                }
+            })
+            
+        })
+
+        document.getElementById('confirm').addEventListener('click' , () =>{
+
+
+
+            // controle
+
+            const semestre = $("#semestre").val();
+            const section = $("#section").val();
+            const module = $("#module").val();
+            window.location.href = `/surveillance/${semestre}/${section}/${module}`
+    
+
+        });
+        
+    </script>
+    
+
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap');
+    </style>
+</body>
+</html>
