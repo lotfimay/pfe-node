@@ -7,11 +7,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+model ChargeCours {
+  code_section    String     @db.VarChar(30)
+  code_module     String     @db.VarChar(30)
+  code_enseignant String     @db.VarChar(30)
+  Enseignant      Enseignant @relation(fields: [code_enseignant], references: [code_enseignant], onDelete: SetNull, onUpdate: NoAction, map: "FK_CHARGECOURS_ENSEIGNANT")
+  Module          Module     @relation(fields: [code_module], references: [code_module], onDelete: Cascade, onUpdate: NoAction, map: "FK_CHARGECOURS_MODULE")
+  Section         Section    @relation(fields: [code_section], references: [code_section], onDelete: Cascade, onUpdate: NoAction, map: "FK_CHARGECOURS_SECTION")
+
+  @@id([code_section, code_module, code_enseignant], map: "PK_CHARGECOURS")
+  @@unique([code_section, code_module], map: "UNIQUE_SECTION_MODULE_CHARGECOURS")
+}
+
 model Creneau {
+  code_creneau BigInt        @id(map: "PK_CRENEAU") @default(autoincrement())
   date         DateTime      @db.Date
   start_time   DateTime      @db.Timestamp(6)
   end_time     DateTime      @db.Timestamp(6)
-  code_creneau BigInt        @id(map: "PK_CRENEAU") @default(autoincrement())
   Examen       Examen[]
   Reservation  Reservation[]
 
@@ -40,7 +52,7 @@ model Enseignant {
 model Examen {
   code_module  String        @db.VarChar(30)
   code_section String        @db.VarChar(30)
-  code_creneau BigInt
+  code_creneau BigInt        @default(autoincrement())
   Creneau      Creneau       @relation(fields: [code_creneau], references: [code_creneau], onDelete: Cascade, onUpdate: NoAction, map: "FK_EXAMEN_CRENEAU")
   Module       Module        @relation(fields: [code_module], references: [code_module], onDelete: Cascade, onUpdate: NoAction, map: "FK_EXAMEN_MODULE")
   Section      Section       @relation(fields: [code_section], references: [code_section], onDelete: Cascade, onUpdate: NoAction, map: "FK_EXAMEN_SECTION")
@@ -68,9 +80,9 @@ model LocalExamen {
   code_local   String         @db.VarChar(10)
   code_module  String         @db.VarChar(30)
   code_section String         @db.VarChar(30)
-  code_creneau BigInt
+  code_creneau BigInt         @default(autoincrement())
   Local        Local          @relation(fields: [code_local], references: [code_local], onDelete: Cascade, onUpdate: NoAction, map: "FK_LOCAEXAMEN_LOCAL")
-  Examen       Examen         @relation(fields: [code_module, code_section, code_creneau], references: [code_module, code_section, code_creneau], onDelete: Cascade, map: "FK_LOCALEXAMEN_EXAMEN")
+  Examen       Examen         @relation(fields: [code_module, code_section, code_creneau], references: [code_module, code_section, code_creneau], onDelete: Cascade, onUpdate: NoAction, map: "FK_LOCALEXAMEN_EXAMEN")
   Surveillance Surveillance[]
 
   @@id([code_local, code_module, code_section, code_creneau], map: "PK_LOCALEXAMEN")
@@ -98,9 +110,9 @@ model ModuleSpecialite {
 }
 
 model Reservation {
+  code_creneau BigInt  @default(autoincrement())
   code_local   String  @db.VarChar(10)
   disponible   Boolean @default(true)
-  code_creneau BigInt
   Creneau      Creneau @relation(fields: [code_creneau], references: [code_creneau], onDelete: Cascade, onUpdate: NoAction, map: "FK_RESERVATION_CRENEAU")
   Local        Local   @relation(fields: [code_local], references: [code_local], onDelete: Cascade, onUpdate: NoAction, map: "FK_RESERVATION_LOCAL")
 
@@ -108,14 +120,13 @@ model Reservation {
 }
 
 model Section {
-  code_section     String        @id(map: "PK_SECTION") @db.VarChar(30)
-  nom_section      String        @db.VarChar(1)
-  anneeEtude       Int
-  code_specialite  String        @db.VarChar(30)
-  nombre_etudiants Int
-  Specialite       Specialite    @relation(fields: [code_specialite], references: [code_specialite], onDelete: Cascade, onUpdate: NoAction, map: "FK_SECTION_SPECIALITE")
-  ChargeCours      ChargeCours[]
-  Examen           Examen[]
+  code_section    String        @id(map: "PK_SECTION") @db.VarChar(30)
+  nom_section     String        @db.VarChar(1)
+  anneeEtude      Int
+  code_specialite String        @db.VarChar(30)
+  Specialite      Specialite    @relation(fields: [code_specialite], references: [code_specialite], onDelete: Cascade, onUpdate: NoAction, map: "FK_SECTION_SPECIALITE")
+  ChargeCours     ChargeCours[]
+  Examen          Examen[]
 }
 
 model Specialite {
@@ -133,22 +144,10 @@ model Surveillance {
   code_local      String      @db.VarChar(10)
   code_module     String      @db.VarChar(30)
   code_section    String      @db.VarChar(30)
-  code_creneau    BigInt
+  code_creneau    BigInt      @default(autoincrement())
   Enseignant      Enseignant  @relation(fields: [code_enseignant], references: [code_enseignant], onDelete: Cascade, onUpdate: NoAction, map: "FK_SURVEILLANCE_ENSEINGNANT")
   LocalExamen     LocalExamen @relation(fields: [code_local, code_module, code_section, code_creneau], references: [code_local, code_module, code_section, code_creneau], onDelete: Cascade, onUpdate: NoAction, map: "FK_SURVEILLANCE_LOCALEXAMEN")
 
   @@id([code_enseignant, code_local, code_module, code_section, code_creneau], map: "PK_SURVEILLANCE")
-  @@unique([code_enseignant, code_creneau], map: "UNIQUE_ENSEIGNANT_CRENEAU")
-}
-
-model ChargeCours {
-  code_section    String     @db.VarChar(30)
-  code_module     String     @db.VarChar(30)
-  code_enseignant String     @db.VarChar(30)
-  Enseignant      Enseignant @relation(fields: [code_enseignant], references: [code_enseignant], onDelete: SetNull, onUpdate: NoAction, map: "FK_CHARGECOURS_ENSEIGNANT")
-  Module          Module     @relation(fields: [code_module], references: [code_module], onDelete: Cascade, onUpdate: NoAction, map: "FK_CHARGECOURS_MODULE")
-  Section         Section    @relation(fields: [code_section], references: [code_section], onDelete: Cascade, onUpdate: NoAction, map: "FK_CHARGECOURS_SECTION")
-
-  @@id([code_section, code_module, code_enseignant], map: "PK_CHARGECOURS")
-  @@unique([code_section, code_module], map: "UNIQUE_SECTION_MODULE_CHARGECOURS")
+  @@unique([code_creneau, code_enseignant], map: "UNIQUE_CRENEAU_ENSEIGNANT")
 }

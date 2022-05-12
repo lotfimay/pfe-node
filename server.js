@@ -7,9 +7,11 @@ const xlsx = require('xlsx');
 const app = express();
 const { PrismaClient }  = require('@prisma/client');
 const prisma = new PrismaClient();
+const pdfService = require('./services/pdf-service');
 
 const planificationRouter = require('./routes/PlanificationRouter');
 const ajaxRouter = require('./routes/AjaxRouter');
+
 
 
 app.use(express.static('public'));
@@ -69,7 +71,6 @@ app.get('/consulter' , async (req , res) =>{
 })
 
 app.get('/consulter/:semestre/:section_id' , async(req , res) => {
-
     let exams = await prisma.examen.findMany({
         where : {
             code_section : req.params.section_id,
@@ -139,7 +140,6 @@ app.get('/consulter/:semestre/:section_id' , async(req , res) => {
         }
         exams[index].locaux_presentation = result;
     }
-    console.log(exams);
     return res.render('consulter_planning' , {
         'exams' : exams,
         'niveau' : niveau,
@@ -152,8 +152,45 @@ app.get('/consulter/:semestre/:section_id' , async(req , res) => {
 app.use('/planifier' , planificationRouter)
 // ---------------- end planification -----------------------------------
 
-
-
+app.get('/invoice', (req, res, next) => {
+    const invoice = {
+      shipping: {
+          name: 'John Doe',
+          address: '1234 Main Street',
+          city: 'San Francisco',
+          state: 'CA',
+          country: 'US',
+          postal_code: 94111,
+        },
+      items:   [
+          {
+              date: '2022-15-31',
+              horaire: '10:15:00',
+              module: 'Algorithme',
+              salles: '315D+221D+151D',
+          },
+          {
+              date: '2022-15-31',
+              horaire: '10:15:00',
+              module: 'Algorithme',
+              salles: '315D+221D+151D',
+          },
+      ],
+      subtotal: 8000,
+      paid: 0,
+      invoice_nr: 1234,
+    };
+    
+    const stream = res.writeHead(200, {
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'attachment;filename=invoice.pdf',
+    });
+    pdfService.buildPDF(
+      (chunk) => stream.write(chunk),
+      () => stream.end(),
+      invoice
+    );
+  });
 app.use((req , res) =>{
     res.status(404).json('Page not found');
      

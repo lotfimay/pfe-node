@@ -28,6 +28,9 @@
                         <div class="box-table">
                             <h2>Salle</h2>
                         </div>
+                        <div class="box-table">
+                            <h2>PV examen</h2>
+                        </div>
                     </div>
                     <% 
                       for(let index in exams){%>
@@ -47,18 +50,22 @@
                         </div>
                         <div class="box-table">
                             <h2><%=exams[index].code_module%></h2>
-                        </div>
+                        </div>  
                         <div class="box-table">
                             <h2><%=exams[index].locaux_presentation%></h2>
+                        </div>
+                        <div class="box-table">
+                            <button>Générer</button>
                         </div>
                     </div>
                 <%}%> 
                 </div>
                 <div class="generate">
-                    <button onclick="generatePDF()" id="buttongenerer">Générer</button>
+                    <button onclick="GeneratePDF()" id="buttongenerer">Générer</button>
                 </div>
         </section>
     </div>
+    <script src="table.js"></script>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
     <style>
