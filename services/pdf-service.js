@@ -36,7 +36,6 @@ function tablehead(doc){
     .text("Horaire", 210, 355)
     .text("Module", 320, 355)
     .text("Salles", 450, 355)
-    .lineto(100, 160)
     .moveDown();
 }
 function generateTableRow(doc, y, c1, c2, c3, c4) {

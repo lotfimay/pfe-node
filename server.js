@@ -8,6 +8,7 @@ const app = express();
 const { PrismaClient }  = require('@prisma/client');
 const prisma = new PrismaClient();
 const pdfService = require('./services/pdf-service');
+const pdfService2 = require('./services/pdf-pvexamen');
 
 const planificationRouter = require('./routes/PlanificationRouter');
 const ajaxRouter = require('./routes/AjaxRouter');
@@ -186,6 +187,28 @@ app.get('/invoice', (req, res, next) => {
       'Content-Disposition': 'attachment;filename=invoice.pdf',
     });
     pdfService.buildPDF(
+      (chunk) => stream.write(chunk),
+      () => stream.end(),
+      invoice
+    );
+  });
+app.get('/pvexamen', (req, res, next) => {
+    const invoice = {
+      items:   [
+          {
+              Nom: 'Dr. BOUIBEDE Karima ',
+          },
+          {
+              Nom: 'Dr. BENATIA Imene',
+          },
+      ],
+    };
+    
+    const stream = res.writeHead(200, {
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'attachment;filename=invoice.pdf',
+    });
+    pdfService2.PVexamen(
       (chunk) => stream.write(chunk),
       () => stream.end(),
       invoice
