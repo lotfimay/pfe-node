@@ -25,10 +25,10 @@ model Departement {
 }
 
 model Enseignant {
-  code_enseignant   String         @id(map: "PK_ENSEIGNANT") @db.VarChar(30)
+  code_enseignant   BigInt         @id(map: "PK_ENSEIGNANT") @default(autoincrement())
   nom_enseignant    String         @db.VarChar(100)
   prenom_enseignant String         @db.VarChar(100)
-  email             String         @unique(map: "UNIQUE_EMAIL") @db.VarChar(255)
+  email             String?        @db.VarChar(255)
   telephone_1       String?        @db.VarChar(10)
   telephone_2       String?        @db.VarChar(10)
   code_grade        String         @db.VarChar(30)
@@ -129,22 +129,22 @@ model Specialite {
 }
 
 model Surveillance {
-  code_enseignant String      @db.VarChar(30)
+  code_enseignant BigInt      @default(autoincrement())
   code_local      String      @db.VarChar(10)
   code_module     String      @db.VarChar(30)
   code_section    String      @db.VarChar(30)
-  code_creneau    BigInt
+  code_creneau    BigInt      @default(autoincrement())
   Enseignant      Enseignant  @relation(fields: [code_enseignant], references: [code_enseignant], onDelete: Cascade, onUpdate: NoAction, map: "FK_SURVEILLANCE_ENSEINGNANT")
   LocalExamen     LocalExamen @relation(fields: [code_local, code_module, code_section, code_creneau], references: [code_local, code_module, code_section, code_creneau], onDelete: Cascade, onUpdate: NoAction, map: "FK_SURVEILLANCE_LOCALEXAMEN")
 
   @@id([code_enseignant, code_local, code_module, code_section, code_creneau], map: "PK_SURVEILLANCE")
-  @@unique([code_enseignant, code_creneau], map: "UNIQUE_ENSEIGNANT_CRENEAU")
+  @@unique([code_creneau, code_enseignant], map: "UNIQUE_CRENEAU_ENSEIGNANT")
 }
 
 model ChargeCours {
   code_section    String     @db.VarChar(30)
   code_module     String     @db.VarChar(30)
-  code_enseignant String     @db.VarChar(30)
+  code_enseignant BigInt     @default(autoincrement())
   Enseignant      Enseignant @relation(fields: [code_enseignant], references: [code_enseignant], onDelete: SetNull, onUpdate: NoAction, map: "FK_CHARGECOURS_ENSEIGNANT")
   Module          Module     @relation(fields: [code_module], references: [code_module], onDelete: Cascade, onUpdate: NoAction, map: "FK_CHARGECOURS_MODULE")
   Section         Section    @relation(fields: [code_section], references: [code_section], onDelete: Cascade, onUpdate: NoAction, map: "FK_CHARGECOURS_SECTION")

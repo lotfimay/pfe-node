@@ -3,204 +3,51 @@
     <div class="container">
         <%- include('./partials/navebar.ejs') %>
         <section class="menu">
-            <div class="box">
-                    <div class="insidebox sections">
-                        <p>Le module :</p>
-                        <select name="section" id="section">
-                            <option value="empty">---------------</option>
+            <div class="cardModify">
+                <form action="" method="post">
+                    <div class="card module">
+                        <h2>Module :</h2>
+                        <select name="module" id="module">
+                            <option value="<%=module.code_module%>"><%=module.code_module%></option>
                         </select>
                     </div>
-                    <div class="insidebox sections">
-                        <p>Le creneau :</p>
-                        <select name="module" id="module">
-                            <option value="empty">---------------</option>
+                    <div class="card creneau">
+                        <h2>Créneau :</h2>
+                        <%
+                        var dd = String(creneau.Creneau.date.getDate()).padStart(2, '0');
+                        var mm = String(creneau.Creneau.date.getMonth() + 1).padStart(2, '0'); //January is 0!
+                        var yyyy = creneau.Creneau.date.getFullYear();
+                        let result = dd + '/' + mm + '/' + yyyy;
+                        %>
+                        <select name="creneau" id="creneau">
+                            <option value="<%=creneau.Creneau.code_creneau%>"><%= result %>     <%=creneau.Creneau.start_time.getHours() - 1%>:<%=creneau.Creneau.start_time.getMinutes()%>:00 - <%=creneau.Creneau.end_time.getHours() - 1%>:<%=creneau.Creneau.end_time.getMinutes()%>:00</option>
                         </select>
                     </div>
-                    <div class="insidebox sections">
-                        <p>La salle :</p>
-                        <select name="module" id="module">
-                            <option value="empty">---------------</option>
+                    <div class="card creneau">
+                        <h2>La salle :</h2>
+                        <select name="local" id="local">
+                            <option value="<%=local.code_local%>"><%=local.code_local%></option>
                         </select>
                     </div>
                     <div class="salle">
-                        <h2>Les salles disponibles:</h2>                           
+                        <h2>Les surveillants :</h2>                           
                             <div class="scroll">
                                 <div class="checkbox">
-                                    <div class="label">
-                                        <label for="room">223</label>
-                                        <input type="checkbox" name="" id="room">  
-                                    </div>
-                                    <div class="label">
-                                        <label for="room">223</label>
-                                        <input type="checkbox" name="" id="room">  
-                                    </div>
-                                    <div class="label">
-                                        <label for="room">223</label>
-                                        <input type="checkbox" name="" id="room">  
-                                    </div>
-                                    <div class="label">
-                                        <label for="room">223</label>
-                                        <input type="checkbox" name="" id="room">  
-                                    </div>
-                                    <div class="label">
-                                        <label for="room">223</label>
-                                        <input type="checkbox" name="" id="room">  
-                                    </div>
-                                    <div class="label">
-                                        <label for="room">223</label>
-                                        <input type="checkbox" name="" id="room">  
-                                    </div>
-                                    <div class="label">
-                                        <label for="room">223</label>
-                                        <input type="checkbox" name="" id="room">  
-                                    </div>
+                                    <%
+                                    for(let index in enseignants){%>
+                                      <div class="label">
+                                          <label for="surveillant"><%=enseignants[index].nom_enseignant%> <%=enseignants[index].prenom_enseignant%> ( <%=enseignants[index].nb%> )</label>
+                                          <input type="checkbox" name="surveillant" id="surveillant" value="<%=enseignants[index].code_enseignant%>">  
+                                      </div>
+                                    <%}%>
                                 </div>
                             </div>
                     </div>
-                    <div class="button">
-                        <button id="confirm">Confirmer</button>
-                    </div>
+                    <button type="submit">Terminer</button>
+                </form>
             </div>
         </section>
-
-       
-
     </div>
-    
-    <script>
-        $("#palier").change(function(){
-           const palier = $(this).val();
-           let flag = false;
-           if(palier == 'LICENCE'){
-            
-            $("#palier").html(
-               '<option value="LICENCE">License</option><option value="MASTER">Master</option>'
-           ); 
-           flag = true
-           }
-           else{
-            $("#palier").html(
-               '<option value="MASTER">Master</option><option value="LICENCE">License</option>'
-           );
-           }
-           const url = "/ajax/specialites_par__palier"
-           $.ajax({
-            url:url,
-            data:{
-            'palier':palier
-            },
-            success:function(data){
-            $("#specialite").html(data);
-              if(flag){
-                 $("#niveau").html('<option value=\"2\">L2</option><option value=\"3\">L3</option>');
-              }
-             else{
-                $("#niveau").html('<option value="4">M1</option><option value="5">M2</option>');
-             }
-             const specialite = $("#specialite").val();
-             const niveau = $("#niveau").val();
-             $.ajax({
-               url : '/ajax/sections_par_niveau',
-               data : {
-               'code_specialite' : specialite,
-               'niveau' : niveau,
-               },
-               success : function(data){
-                      $("#section").html(data);
-                      const section  = $("#section").val();
-                      const url = '/ajax/modules__par__section'
-                        $.ajax({
-                            url :url,
-                            data : {
-                            'code_section' : section
-                            },
-                            success : function(data){
-                                    $("#module").html(data);
-                            },
-                            error : function(err){
-                                    console.log(err);
-                            }
-                        });
-
-               },
-               error : function(error){
-                   console.log(error)
-               }
-             });
-            },
-            error:function(error){
-                console.log(error)
-            }
-           })
-        });       
-        $("#niveau").change(function(){
-            let val = $(this).val();
-            let specialite = $("#specialite").val();
-            const url = "/ajax/sections_par_niveau"
-            $.ajax({
-            url:url,
-            data:{
-            'code_specialite':specialite,
-            'niveau' : val
-            },
-            success:function(data){
-            $("#section").html(data);
-                 const section  = $("#section").val();
-                 const second_url = '/ajax/modules__par__section'
-                $.ajax({
-                    url :second_url,
-                    data : {
-                        'code_section' : section
-                    },
-                    success : function(data){
-                        $("#module").html(data);
-                    },
-                    error : function(err){
-                        console.log(err);
-                    }
-                })
-            },
-            error:function(error){
-                console.log(error)
-            }
-           })
-
-        });
-        $("#section").change(function(){
-            const section  = $("#section").val();
-            const url = '/ajax/modules__par__section'
-            $.ajax({
-                url :url,
-                data : {
-                    'code_section' : section
-                },
-                success : function(data){
-                    $("#module").html(data);
-                },
-                error : function(err){
-                     console.log(err);
-                }
-            })
-            
-        })
-
-        document.getElementById('confirm').addEventListener('click' , () =>{
-
-
-
-            // controle
-
-            const semestre = $("#semestre").val();
-            const section = $("#section").val();
-            const module = $("#module").val();
-            window.location.href = `/surveillance/${semestre}/${section}/${module}`
-    
-
-        });
-        
-    </script>
-    
-
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
     <style>

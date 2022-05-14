@@ -10,6 +10,12 @@ const prisma = new PrismaClient();
 
 const planificationRouter = require('./routes/PlanificationRouter');
 const ajaxRouter = require('./routes/AjaxRouter');
+const pdfService = require('./services/pdf-service');
+const pdfService2 = require('./services/pdf-pvexamen');
+
+
+
+
 
 
 app.use(express.static('public'));
@@ -39,7 +45,6 @@ app.get('/surveillance/:semestre_id/:section_id/:module_id' , async (req , res) 
             }
         }
     });
-    console.log(locaux);
     return res.render('locaux' , {
         'locaux' : locaux,
         'semestre' : req.params.semestre_id,
@@ -51,7 +56,97 @@ app.get('/surveillance/:semestre_id/:section_id/:module_id' , async (req , res) 
 });
 
 app.get('/surveillance/:semestre_id/:section_id/:module_id/:local_id' , async (req , res)=>{
-  return res.render('affecter_surveillants');
+
+    let my_module = await prisma.module.findUnique({
+        where : {
+            code_module : req.params.module_id,
+        }
+    });
+    let creneau = await prisma.examen.findUnique({
+        where : {
+            code_section_code_module : {
+                code_module : req.params.module_id,
+                code_section : req.params.section_id,
+            }
+        },
+        select : {
+            Creneau : {
+                select : {
+                    code_creneau : true,
+                    date : true,
+                    start_time : true,
+                    end_time : true,
+                }
+            }
+        }
+    });
+
+    let local = await prisma.local.findUnique({
+        where : {
+            code_local : req.params.local_id,
+        }
+    });
+    
+    let enseignant_interdits = await prisma.surveillance.findMany({
+        select : {
+            code_enseignant : true,
+        },
+        where : {
+            code_creneau : creneau.Creneau.code_creneau,
+        }
+    });
+    let enseignant_interdits_ids = enseignant_interdits.map(element => element.code_enseignant);
+
+    let enseignants = await prisma.enseignant.findMany({
+        where : {
+            code_enseignant : {notIn : enseignant_interdits_ids}
+        }
+    });
+    
+    for(let index in enseignants){
+        let nb = await prisma.surveillance.aggregate({
+            _count : {
+                  code_enseignant : true,
+            },
+            where : {
+                code_enseignant : enseignants[index].code_enseignant,
+            }
+        });
+        let grade = await prisma.grade.findUnique({
+            where : {
+                code_grade : enseignants[index].code_grade,
+            }
+        });
+        nb._count.code_enseignant = grade.nombre_surveillances - nb._count.code_enseignant;
+        enseignants[index].nb  = nb._count.code_enseignant;
+    }
+  
+
+  return res.render('affecter_surveillants' ,{
+      'module' : my_module,
+      'creneau' : creneau,
+      'local' : local,
+      'enseignants' : enseignants
+  });
+});
+
+app.post('/surveillance/:semestre_id/:section_id/:module_id/:local_id' , async (req , res) =>{
+   
+
+   for(let index in req.body.surveillant){
+       let surveillance = await prisma.surveillance.create({
+             data : {
+                code_creneau : parseInt(req.body.creneau),
+                code_enseignant : parseInt(req.body.surveillant[index]),
+                code_local : req.params.local_id,
+                code_module : req.params.module_id,
+                code_section : req.params.section_id,
+            }
+       });
+  }  
+
+    res.redirect(`/surveillance/${req.params.semestre_id}/${req.params.section_id}/${req.params.module_id}`);
+    
 });
 // ---------- staaaart ajaaaaaaaaaax ------------
 app.use('/ajax' , ajaxRouter)
@@ -153,6 +248,177 @@ app.use('/planifier' , planificationRouter)
 // ---------------- end planification -----------------------------------
 
 
+app.get('/invoice', (req, res, next) => {
+    const invoice = {
+      shipping: {
+          name: 'John Doe',
+          address: '1234 Main Street',
+          city: 'San Francisco',
+          state: 'CA',
+          country: 'US',
+          postal_code: 94111,
+        },
+      items:   [
+          {
+              date: '2022-15-31',
+              horaire: '10:15:00',
+              module: 'Algorithme',
+              salles: '315D+221D+151D',
+          },
+          {
+              date: '2022-15-31',
+              horaire: '10:15:00',
+              module: 'Algorithme',
+              salles: '315D+221D+151D',
+          },
+      ],
+      subtotal: 8000,
+      paid: 0,
+      invoice_nr: 1234,
+    };
+    
+    const stream = res.writeHead(200, {
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'attachment;filename=invoice.pdf',
+    });
+    pdfService.buildPDF(
+      (chunk) => stream.write(chunk),
+      () => stream.end(),
+      invoice
+    );
+  });
+app.get('/:section_id/:module_id/pvexamen', async (req, res, next) => {
+
+
+    let data = await prisma.examen.findUnique({
+
+
+        where : {
+            code_section_code_module : {
+                code_section : req.params.section_id,
+                code_module : req.params.module_id,
+            }
+        },
+        select : {
+            Creneau : {
+                select : {
+                    date : true,
+                    start_time : true,
+                }
+            },
+            code_module : true,
+            code_section : true,
+        }
+    });
+
+    let charge_cours = await prisma.chargeCours.findUnique({
+        where : {
+            code_section_code_module : {
+                code_section : req.params.section_id,
+                code_module : req.params.module_id,
+            }
+        },
+        select  : {
+            Enseignant : {
+                select : {
+                    nom_enseignant : true,
+                    prenom_enseignant : true,
+                }
+            }
+        }
+    });
+
+    let locaux = await prisma.localExamen.findMany({
+        where : {
+            code_module : req.params.module_id,
+            code_section : req.params.section_id,
+        },
+        select : {
+            Local : {
+                select : {
+                    code_local : true,
+                }
+            }
+        }
+    });
+    
+    console.log(data);
+    console.log(charge_cours);
+    let locaux_presentation = '';
+    for(let index in locaux){
+        if(index < locaux.length - 1){
+            locaux_presentation = locaux_presentation + locaux[index].Local.code_local + '+';
+        }else{
+            locaux_presentation = locaux_presentation + locaux[index].Local.code_local;
+        }
+    }
+
+    let surveillants__ = await prisma.surveillance.findMany({
+        where : {
+            code_module : req.params.module_id,
+            code_section : req.params.section_id,
+        },
+        select : {
+            Enseignant : {
+                select : {
+                    nom_enseignant : true,
+                    prenom_enseignant : true,
+                }
+            }
+        }
+    });
+
+  
+
+    let surveillants = [];
+    for(let index in surveillants__){
+        surveillants.push(surveillants__[index].Enseignant.nom_enseignant + ' ' + surveillants__[index].Enseignant.prenom_enseignant);
+    }
+
+    data.surveillants = surveillants;
+    data.locaux = locaux_presentation;
+    
+    console.log(data);
+    const invoice = {
+      items:   [
+          {
+              Nom: 'Dr. BOUIBEDE Karima ',
+          },
+          {
+              Nom: 'Dr. BENATIA Imene',
+          },
+      ],
+    };
+    
+    // const stream = res.writeHead(200, {
+    //   'Content-Type': 'application/pdf',
+    //   'Content-Disposition': 'attachment;filename=invoice.pdf',
+    // });
+    // pdfService2.PVexamen(
+    //   (chunk) => stream.write(chunk),
+    //   () => stream.end(),
+    //   invoice
+    // );
+    res.json('suiii');
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 app.use((req , res) =>{
     res.status(404).json('Page not found');
@@ -173,6 +439,7 @@ app.listen((3000) , ()=>{
 
 
 async  function need_it_later(req , res){
+
     
     const workbook = xlsx.readFile('test.xlsx');
 
@@ -296,6 +563,42 @@ async  function need_it_later(req , res){
 
 }
 
+
+async function inserer_profs(req , res){
+
+
+    const workbook = xlsx.readFile('profs_2.xlsx');
+
+    let worksheets = {};
+
+    for(const sheetName of workbook.SheetNames){
+        worksheets[sheetName] = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName])
+    }
+    const rows = worksheets.Sheet1;
+
+    for(index in rows){
+
+
+        try{
+            let enseignant = await prisma.enseignant.create({
+                data : {
+                    nom_enseignant : rows[index].Nom,
+                    prenom_enseignant : rows[index].Prenom,
+                    email : rows[index].email,
+                    code_grade : rows[index].Grade,
+                }
+            });
+        }catch(error){
+            console.log(error)
+        }
+
+        
+        
+        
+    }
+
+
+}
 
 
 
