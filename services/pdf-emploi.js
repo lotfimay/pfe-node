@@ -30,7 +30,7 @@ function generateheader(doc){
         .text("de moyenne durée", 300, 130,{width: 350, fontWeight: 'bold'})
         .fill('#000').stroke()
         .fontSize(16)
-        .text("Semestre 1 Session 1         Année Universitaire : 2021 / 2022", 200,180, {width: 450})
+        .text("Semestre 1        Année Universitaire : 2021 / 2022", 210,180, {width: 450})
         .fontSize(14)
         .moveDown();
 }
