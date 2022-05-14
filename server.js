@@ -9,6 +9,7 @@ const { PrismaClient }  = require('@prisma/client');
 const prisma = new PrismaClient();
 const pdfService = require('./services/pdf-service');
 const pdfService2 = require('./services/pdf-pvexamen');
+const emploiTemps = require('./services/pdf-emploi');
 
 const planificationRouter = require('./routes/PlanificationRouter');
 const ajaxRouter = require('./routes/AjaxRouter');
@@ -212,6 +213,39 @@ app.get('/pvexamen', (req, res, next) => {
       (chunk) => stream.write(chunk),
       () => stream.end(),
       invoice
+    );
+  });
+app.get('/emploi', (req, res, next) => {
+    const invoice = {
+      items:   [
+          {
+              An: 'L2',
+              Sec: 'ISIL A',
+              Date :'15-10-2020',
+              Horaire: "10:15:00",
+              Module: "ALGO",
+              Salle: '151D+101D+215D'
+          },
+          {
+            An: 'L2',
+            Sec: 'ISIL A',
+            Date :'15-10-2020',
+            Horaire: "10:15:00",
+            Module: "ALGO",
+            Salle: '151D+101D+215D'
+          },
+      ],
+    };
+    
+    const stream = res.writeHead(200, {
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': 'attachment;filename=invoice.pdf',
+    });
+    emploiTemps.Emploi(
+      (chunk) => stream.write(chunk),
+      () => stream.end(),
+      invoice,
+      
     );
   });
 app.use((req , res) =>{
