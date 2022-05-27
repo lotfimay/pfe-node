@@ -1,17 +1,47 @@
 
 const express = require('express');
-const { render, redirect } = require('express/lib/response');
 const fs = require('fs');
 const morgan = require('morgan');
-const xlsx = require('xlsx');
+
 const app = express();
 const { PrismaClient }  = require('@prisma/client');
 const prisma = new PrismaClient();
 
 const planificationRouter = require('./routes/PlanificationRouter');
+const surveillanceRouter = require('./routes/SurveillanceRouter');
 const ajaxRouter = require('./routes/AjaxRouter');
+const enseignantRouter = require('./routes/EnseignantRouter');
+
+
 const pdfService = require('./services/pdf-service');
 const pdfService2 = require('./services/pdf-pvexamen');
+const pdfService3 = require('./services/pdf-emploi');
+
+const readExcelFile = require('./utils/excelHelper');
+
+
+const passport = require("passport");
+const flash = require("express-flash");
+const session = require("express-session");
+const initializePassport = require("./passportConfig");
+
+const bcrypt = require('bcrypt');
+const multer = require('multer');
+const nodemailer = require('nodemailer');
+
+var storage = multer.diskStorage({
+    destination: function(req, file, cb) {
+        cb(null, __dirname + '/uploads/')
+    },
+    filename: function(req, file, cb) {
+        cb(null, file.originalname + '-' + Date.now() + '.xlsx')
+    }
+});
+var upload = multer({
+    storage: storage
+});
+
+
 
 
 
@@ -24,150 +54,107 @@ app.use(morgan('dev'));
 app.use(express.json());
 app.set('view engine' , 'ejs');
 
-
-app.get('/surveillance' , (req , res) => {
-    return res.render('surveillance');
-});
-
-app.get('/surveillance/:semestre_id/:section_id/:module_id' , async (req , res) =>{
-
-    let locaux = await prisma.localExamen.findMany({
-        where : {
-            code_section : req.params.section_id,
-            code_module : req.params.module_id,
-        },
-        select : {
-            Local : {
-                select : {
-                    code_local : true,
-                    capacite : true,
-                }
-            }
-        }
-    });
-    return res.render('locaux' , {
-        'locaux' : locaux,
-        'semestre' : req.params.semestre_id,
-        'section' : req.params.section_id,
-        'module' : req.params.module_id,
-    });
+initializePassport(passport);
 
 
-});
+app.use(
+    session({
+      // Key we want to keep secret which will encrypt all of our information
+      secret: process.env.SESSION_SECRET,
+      // Should we resave our session variables if nothing has changes which we dont
+      resave: false,
+      // Save empty value if there is no vaue which we do not want to do
+      saveUninitialized: false
+    })
+);
+app.use(flash());
 
-app.get('/surveillance/:semestre_id/:section_id/:module_id/:local_id' , async (req , res)=>{
 
-    let my_module = await prisma.module.findUnique({
-        where : {
-            code_module : req.params.module_id,
-        }
-    });
-    let creneau = await prisma.examen.findUnique({
-        where : {
-            code_section_code_module : {
-                code_module : req.params.module_id,
-                code_section : req.params.section_id,
-            }
-        },
-        select : {
-            Creneau : {
-                select : {
-                    code_creneau : true,
-                    date : true,
-                    start_time : true,
-                    end_time : true,
-                }
-            }
-        }
-    });
+app.use(passport.initialize());
+// Store our variables to be persisted across the whole session. Works with app.use(Session) above
+app.use(passport.session());
 
-    let local = await prisma.local.findUnique({
-        where : {
-            code_local : req.params.local_id,
-        }
-    });
-    
-    let enseignant_interdits = await prisma.surveillance.findMany({
-        select : {
-            code_enseignant : true,
-        },
-        where : {
-            code_creneau : creneau.Creneau.code_creneau,
-        }
-    });
-    let enseignant_interdits_ids = enseignant_interdits.map(element => element.code_enseignant);
 
-    let enseignants = await prisma.enseignant.findMany({
-        where : {
-            code_enseignant : {notIn : enseignant_interdits_ids}
-        }
-    });
-    
-    for(let index in enseignants){
-        let nb = await prisma.surveillance.aggregate({
-            _count : {
-                  code_enseignant : true,
-            },
-            where : {
-                code_enseignant : enseignants[index].code_enseignant,
-            }
-        });
-        let grade = await prisma.grade.findUnique({
-            where : {
-                code_grade : enseignants[index].code_grade,
-            }
-        });
-        nb._count.code_enseignant = grade.nombre_surveillances - nb._count.code_enseignant;
-        enseignants[index].nb  = nb._count.code_enseignant;
-    }
-  
 
-  return res.render('affecter_surveillants' ,{
-      'module' : my_module,
-      'creneau' : creneau,
-      'local' : local,
-      'enseignants' : enseignants
-  });
-});
 
-app.post('/surveillance/:semestre_id/:section_id/:module_id/:local_id' , async (req , res) =>{
-   
 
-   for(let index in req.body.surveillant){
-       let surveillance = await prisma.surveillance.create({
-             data : {
-                code_creneau : parseInt(req.body.creneau),
-                code_enseignant : parseInt(req.body.surveillant[index]),
-                code_local : req.params.local_id,
-                code_module : req.params.module_id,
-                code_section : req.params.section_id,
-            }
-       });
-  }  
+app.use('/surveillance' ,checkNotAuthenticated,surveillanceRouter)
 
-    res.redirect(`/surveillance/${req.params.semestre_id}/${req.params.section_id}/${req.params.module_id}`);
-    
-});
-// ---------- staaaart ajaaaaaaaaaax ------------
+
+
 app.use('/ajax' , ajaxRouter)
 
-// --------------------- end ajaaaaaaaaaaaaaaaaaxxxxxxxxxxxxx------------
 
-app.get('/' , async (req , res) =>{
-    return res.render('main');  
+
+app.get('/' ,checkNotAuthenticated ,async (req , res) =>{
+    console.log(req.user);
+    return res.render('main',{
+        'user' : req.user,
+    });  
 });
 
 
 
-app.get('/consulter' , async (req , res) =>{
-    res.render('consulter');
-})
 
-app.get('/consulter/:semestre/:section_id' , async(req , res) => {
+app.get('/consulter' , checkNotAuthenticated ,async (req , res) =>{
+
+    if(req.user.type == 'VD'){
+        return res.render('consulter_surveillance');
+    }
+    res.render('consulter',{
+        'user' : req.user,
+    });
+    
+});
+
+app.get('/consulter/:semestre/:session' , async (req , res) =>{
+
+    let result = await prisma.surveillance.findMany({
+        where : {
+            LocalExamen  : {
+               Examen : {
+                   semestre : parseInt(req.params.semestre),
+                   session : parseInt(req.params.session),
+               }
+            }
+        },
+        select : {
+            Enseignant : true,
+            LocalExamen : {
+                select : {
+                    Local : {
+                        select : {
+                            code_local : true,
+                        }
+                    },
+                    Examen : {
+                        select : {
+                            code_module : true,
+                            Creneau : {
+                                select : {
+                                    date : true,
+                                    start_time : true,
+                                }
+                            }
+                        }
+                    }
+                }
+            },
+            
+            
+        }
+    });
+    console.log(result);
+   return  res.json('Okkk');
+});
+
+app.get('/consulter/:semestre/:session/:section_id' ,checkNotAuthenticated ,async(req , res) => {
 
     let exams = await prisma.examen.findMany({
         where : {
             code_section : req.params.section_id,
+            semestre : parseInt(req.params.semestre),
+            session : parseInt(req.params.session),
         },
         select : {
             code_section : true,
@@ -235,59 +222,121 @@ app.get('/consulter/:semestre/:section_id' , async(req , res) => {
         exams[index].locaux_presentation = result;
     }
     console.log(exams);
+    console.log(req.user);
     return res.render('consulter_planning' , {
         'exams' : exams,
         'niveau' : niveau,
-        'section' : section
+        'section' : section,
+        'semestre' : req.params.semestre,
+        'session' : req.params.session,
+        'user' : req.user,
     });
 });
 
 
+
+app.get('/ajouter-utilisateur' , checkNotAuthenticated ,async (req , res) =>{
+
+    const departements = await prisma.departement.findMany();
+    
+
+    res.render('ajouter_utilisateur' , {
+        'departements' : departements,
+        'message' : '',
+        'user' : req.user
+    });
+
+});
+
+app.post('/ajouter-utilisateur' , checkNotAuthenticated,async (req , res ,) =>{
+
+       const departements = await prisma.departement.findMany();
+   
+       try{
+        const hashed_password  = await bcrypt.hash(req.body.password , 10);
+
+
+        const new_user = await prisma.users.create({
+            data : {
+                user_name : req.body.username,
+                password : hashed_password , 
+                email : 'lotfimayouf@gmail.com',
+                type : req.body.type,
+            }
+        });
+
+       }catch(err){
+        
+        console.log(err);
+       }
+
+    
+     
+    res.render('ajouter_utilisateur' , {
+        'message' : 'user created successfully',
+        'departements' : departements,
+        'user' : req.user,
+    });
+});
+
+app.get('/login' , checkAuthenticated , async (req , res) =>{
+    res.render('sign_in');
+});
+
+app.post('/login'  ,passport.authenticate('local', {
+    successRedirect: '/',
+    failureRedirect: '/login',
+    failureFlash: true
+}));
+
+
+app.use('/enseignants' , checkNotAuthenticated  ,  enseignantRouter);
+
+
+
+
+app.get('/upload-file' , async (req , res) =>{
+     res.render('upload_file');
+});
+
+app.post('/upload-file' , upload.single('file'), async (req , res) =>{
+
+    await readExcelFile('./uploads/' + req.file.filename);
+    fs.unlink('./uploads/' + req.file.filename , (err) =>{
+        if(err){
+            console.log(err);
+        }
+        console.log('File deleted successfully');
+    });
+
+    res.redirect('/');
+});
+
+
+
+
+
+
+
+app.get('/logout', (req, res , next) => {
+    req.logout((err) =>{
+        if(err){
+            return next(err); 
+        }
+        res.redirect('/login');
+    });
+    
+});
+
+
+
+
 // ------------------- start planification --------------------------
-app.use('/planifier' , planificationRouter)
+app.use('/planifier'  ,checkNotAuthenticated,planificationRouter)
 // ---------------- end planification -----------------------------------
 
-
-app.get('/invoice', (req, res, next) => {
-    const invoice = {
-      shipping: {
-          name: 'John Doe',
-          address: '1234 Main Street',
-          city: 'San Francisco',
-          state: 'CA',
-          country: 'US',
-          postal_code: 94111,
-        },
-      items:   [
-          {
-              date: '2022-15-31',
-              horaire: '10:15:00',
-              module: 'Algorithme',
-              salles: '315D+221D+151D',
-          },
-          {
-              date: '2022-15-31',
-              horaire: '10:15:00',
-              module: 'Algorithme',
-              salles: '315D+221D+151D',
-          },
-      ],
-      subtotal: 8000,
-      paid: 0,
-      invoice_nr: 1234,
-    };
-    
-    const stream = res.writeHead(200, {
-      'Content-Type': 'application/pdf',
-      'Content-Disposition': 'attachment;filename=invoice.pdf',
-    });
-    pdfService.buildPDF(
-      (chunk) => stream.write(chunk),
-      () => stream.end(),
-      invoice
-    );
-  });
-app.get('/:section_id/:module_id/pvexamen', async (req, res, next) => {
+app.get('/:section_id/:module_id/pvexamen',checkNotAuthenticated ,async (req, res, next) => {
+ 
 
 
     let data = await prisma.examen.findUnique({
@@ -307,7 +356,16 @@ app.get('/:section_id/:module_id/pvexamen', async (req, res, next) => {
                 }
             },
             code_module : true,
-            code_section : true,
+            session : true,
+            semestre : true,
+            Section : {
+                select : {
+                    code_section : true,
+                    anneeEtude : true,
+                    code_specialite : true,
+                    nom_section : true
+                }
+            }
         }
     });
 
@@ -343,7 +401,6 @@ app.get('/:section_id/:module_id/pvexamen', async (req, res, next) => {
     });
     
     console.log(data);
-    console.log(charge_cours);
     let locaux_presentation = '';
     for(let index in locaux){
         if(index < locaux.length - 1){
@@ -377,30 +434,290 @@ app.get('/:section_id/:module_id/pvexamen', async (req, res, next) => {
 
     data.surveillants = surveillants;
     data.locaux = locaux_presentation;
+    data.chargeCours = 'Mayouf' + ' ' + 'Lotfi';
+
+    switch(data.Section.anneeEtude){
+        case 2:
+            data.Section.niveau = 'L2';
+            break;
+        case 3:
+            data.Section.niveau = 'L3';
+            break;
+        case 4:
+            data.Section.niveau = 'M1';
+            break;
+        case 5:
+                data.Section.niveau = 'M2';
+                break;
+    }
+
+    var dd = String(data.Creneau.date.getDate()).padStart(2, '0');
+    var mm = String(data.Creneau.date.getMonth() + 1).padStart(2, '0'); //January is 0!
+    var yyyy = data.Creneau.date.getFullYear();
+    let result = dd + '/' + mm + '/' + yyyy;
+
+    let result_ = (yyyy -1).toString();
+
+    data.annee_universitaire = result_ + ' / ' + yyyy;
+    
+    data.Creneau.date = result;
+
+    let tmp = data.Creneau.start_time.getHours() - 1 + ':'+ data.Creneau.start_time.getMinutes()+':00';
+    
+    data.Creneau.start_time = tmp;
     
     console.log(data);
-    const invoice = {
-      items:   [
-          {
-              Nom: 'Dr. BOUIBEDE Karima ',
-          },
-          {
-              Nom: 'Dr. BENATIA Imene',
-          },
-      ],
-    };
+   
     
-    // const stream = res.writeHead(200, {
-    //   'Content-Type': 'application/pdf',
-    //   'Content-Disposition': 'attachment;filename=invoice.pdf',
-    // });
-    // pdfService2.PVexamen(
-    //   (chunk) => stream.write(chunk),
-    //   () => stream.end(),
-    //   invoice
-    // );
-    res.json('suiii');
+    const stream = res.writeHead(200, {
+      'Content-Type': 'application/pdf',
+      'Content-Disposition': `attachment;filename=PV_EXAMEN_${data.code_module}_${data.Section.niveau}_${data.Section.code_specialite}_${data.Section.nom_section}.pdf`,
+    });
+    pdfService2.PVexamen(
+      (chunk) => stream.write(chunk),
+      () => stream.end(),
+      data
+    );
+    
 });
+
+app.get('/:semestre/:session/:enseignant_id/convocation' , checkNotAuthenticated,async (req , res) => {
+
+
+    let enseignant = await prisma.enseignant.findUnique({
+        where : {
+            code_enseignant : parseInt(req.params.enseignant_id)
+        }
+    });
+  
+
+    let surveillances = await prisma.surveillance.findMany({
+         
+        where : {
+            code_enseignant : parseInt(req.params.enseignant_id),
+            LocalExamen : {
+                Examen : {
+                    semestre : parseInt(req.params.semestre),
+                    session : parseInt(req.params.session),
+                }
+            }
+        },
+        select : {
+            code_creneau : true,
+            code_module : true,
+            code_section : true,
+        }
+    });
+
+    
+    let annee_universitaire = '';
+    for(let index in surveillances){
+        
+        let locaux = await prisma.localExamen.findMany({
+            where : {
+                code_creneau : surveillances[index].code_creneau,
+                code_module : surveillances[index].code_module,
+                code_section : surveillances[index].code_section,
+            },
+            select : {
+                code_local : true,
+            }
+        });
+
+         
+        let locaux_presentation = '';
+
+        for(let j in locaux){
+            
+            if(j == locaux.length - 1){
+                locaux_presentation += locaux[j].code_local;
+            }
+            else locaux_presentation += locaux[j].code_local + '+';
+        }
+
+        let creneau = await prisma.creneau.findUnique({
+            where : {
+                code_creneau : surveillances[index].code_creneau
+            }
+        });
+        
+        var dd = String(creneau.date.getDate()).padStart(2, '0');
+        var mm = String(creneau.date.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var yyyy = creneau.date.getFullYear();
+        let result = dd + '/' + mm + '/' + yyyy;
+
+        let result_ = (yyyy -1).toString();
+
+        annee_universitaire = result_ + ' / ' + yyyy;
+        
+
+        let tmp = creneau.start_time.getHours() - 1 + ':'+ creneau.start_time.getMinutes()+':00';
+
+
+        surveillances[index].locaux_presentation = locaux_presentation;
+        surveillances[index].date = result;
+        surveillances[index].start_time = tmp;
+        
+    }
+
+    let data = new Object();
+
+
+    
+
+    // if(surveillances.length >= 1){
+    //     let semestre_session = await prisma.examen.findUnique({
+    //         where : {
+    //             code_module_code_section_code_creneau : {
+    //                 code_creneau : surveillances[0].code_creneau,
+    //                 code_module : surveillances[0].code_module,
+    //                 code_section : surveillances[0].code_section,
+    //             }
+    //         },
+    //         select : {
+    //             semestre : true,
+    //             session : true,
+    //         }
+    //     });
+        
+    //     data.semestre = semestre_session.semestre;
+    //     data.session = semestre_session.session;
+    // }
+
+    
+    data.semestre = req.params.semestre;
+    data.session = req.params.session;
+      
+    
+    data.surveillances = surveillances;
+    data.Enseignant = enseignant;
+    data.annee_universitaire = annee_universitaire;
+
+    console.log(data);
+
+    const stream = res.writeHead(200, {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment;filename=CONVOCATION_SURVEILLANCES_${data.Enseignant.nom_enseignant}_${data.Enseignant.prenom_enseignant}.pdf`,
+      });
+      pdfService.buildPDF(
+        (chunk) => stream.write(chunk),
+        () => stream.end(),
+        data
+      );
+
+});
+
+app.get('/:semestre/:session/:section_id/plannings' , async(req , res) =>{
+  
+    let data = new Object();
+
+    let annee_universitaire = '';
+    let exams = await prisma.examen.findMany({
+        where : {
+            code_section : req.params.section_id,
+            semestre : parseInt(req.params.semestre),
+            session : parseInt(req.params.session),
+        },
+        select : {
+            code_module : true,
+            Creneau : {
+                select : {
+                    date : true,
+                    start_time : true,
+                }
+            },
+            LocalExamen : {
+                select :{
+                    Local : {
+                        select : {
+                            code_local : true,
+                        }
+                    }
+                }
+            }
+        }
+    });
+
+    
+
+    let section = await prisma.section.findUnique({
+        where : {
+            code_section : req.params.section_id,
+        }
+    });
+
+    switch(section.anneeEtude){
+        case 2:
+            section.niveau = 'L2';
+            break;
+        case 3:
+            section.niveau = 'L3';
+            break;
+        case 4:
+            section.niveau = 'M1';
+            break;
+        case 5:
+            section.niveau = 'M2';
+            break;
+    }
+
+    data.section = section;
+    data.exams = exams;
+    
+
+
+    for(let index in data.exams){
+        let locaux_presentation = '';
+        for(j in data.exams[index].LocalExamen){
+            if( j < data.exams[index].LocalExamen.length - 1){
+                locaux_presentation = locaux_presentation + data.exams[index].LocalExamen[j].Local.code_local + '+';
+            }else{
+                locaux_presentation = locaux_presentation + data.exams[index].LocalExamen[j].Local.code_local;
+            }
+        }
+
+        var dd = String(data.exams[index].Creneau.date.getDate()).padStart(2, '0');
+        var mm = String(data.exams[index].Creneau.date.getMonth() + 1).padStart(2, '0'); //January is 0!
+        var yyyy = data.exams[index].Creneau.date.getFullYear();
+        annee_universitaire = (yyyy - 1).toString() + '/' + yyyy;
+        let result = dd + '/' + mm + '/' + yyyy;
+        data.exams[index].Creneau.date = result;
+        let tmp = data.exams[index].Creneau.start_time.getHours() - 1 + ':'+ data.exams[index].Creneau.start_time.getMinutes()+':00';
+        data.exams[index].Creneau.start_time = tmp;
+        data.exams[index].locaux_presentation = locaux_presentation;
+        delete exams[index].LocalExamen;
+    }
+
+    data.semestre = req.params.semestre;
+    data.session = req.params.session;
+    data.annee_universitaire = annee_universitaire;
+
+
+    const stream = res.writeHead(200, {
+        'Content-Type': 'application/pdf',
+        'Content-Disposition': `attachment;filename=PLANING_EXAMENS_${data.section.niveau}_${data.section.code_specialite}_${data.section.nom_section}.pdf`,
+      });
+
+    pdfService3.Emploi(
+        (chunk) => stream.write(chunk),
+        () => stream.end(),
+        data
+      );
+    
+});
+
+
+
+
+
+
+function checkUser(req , res ,next){
+
+    if(req.user.type != 'VD' && req.user.type != 'SC' && req.user.type == 'SP'){
+        res.redirect('/');
+    }
+    next();
+}
 
 
 
@@ -428,7 +745,19 @@ app.use((req , res) =>{
 
 
 
-
+function checkAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+      return res.redirect('/');
+    }
+    next();
+  }
+  
+function checkNotAuthenticated(req, res, next) {
+    if (req.isAuthenticated()) {
+      return next();
+    }
+    res.redirect('/login');
+  }
 
 
 
@@ -438,130 +767,7 @@ app.listen((3000) , ()=>{
 })
 
 
-async  function need_it_later(req , res){
 
-    
-    const workbook = xlsx.readFile('test.xlsx');
-
-    let worksheets = {};
-
-    for(const sheetName of workbook.SheetNames){
-        worksheets[sheetName] = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName])
-    }
-    const rows = worksheets.Sheet1;
-
-
-    let locaux_created = [];
-
-    for(let index in rows){
-
-
-        const date = ExcelDateToJSDate(rows[index].Date);
-
-        console.log(date)
-
-        const heure = rows[index].Heure;
-        const heures = heure.split('-');
-        const heure_debut = heures[0];
-        const horaire_debut = parseInt(heure_debut.split('H')[0]);
-        const minute_debut =  parseInt(heure_debut.split('H')[1]);
-
-
-        const heure_fin = heures[1];
-
-        const horaire_fin = parseInt(heure_fin.split('H')[0]);
-        const minute_fin =  parseInt(heure_fin.split('H')[1]);
-
-        const start_time = new Date(date);
-        start_time.setDate(start_time.getDate() - 1)
-        start_time.setHours(horaire_debut+1);
-        start_time.setMinutes(minute_debut);
-        start_time.setSeconds(0);
-
-        const end_time = new Date(date);
-        end_time.setDate(end_time.getDate() - 1)
-        end_time.setHours(horaire_fin+1);
-        end_time.setMinutes(minute_fin);
-        start_time.setSeconds(0)
-   
-
-       console.log(start_time);
-       console.log(end_time);
-          
-
-       let exists_creneau = await prisma.creneau.findFirst({
-           where : {
-               date :  date ,
-               start_time : start_time,
-               end_time : end_time
-           }
-       });
-       let new_creneau;
-       if(! exists_creneau){
-
-        new_creneau = await prisma.creneau.create({
-            data : {
-                date : date,
-                start_time : start_time,
-                end_time : end_time
-            }
-        });
-
-       }else{
-           new_creneau = exists_creneau;
-       }
-        
-
-
-
-       
-
-        const locaux = rows[index].Locaux.split(',');
-
-        for(let local in locaux){
-            let exists = await prisma.local.findUnique({
-                where : {
-                    code_local : locaux[local]
-                }
-            });
-            let my_new_local;
-            if(!exists){
-                let new_local = await prisma.local.create({
-                data : {
-                   code_local : locaux[local],
-                   capacite : 100
-                }
-               }).then((result) =>{
-                  my_new_local = result;
-                }).catch((err) =>{
-                console.log(err);
-            });
-            }else{
-               my_new_local = exists;
-            }
-            let reservation = await prisma.reservation.create({
-                data : {
-                    date : new_creneau.date ,
-                    start_time : new_creneau.start_time ,
-                    end_time : new_creneau.end_time,
-                    code_local : my_new_local.code_local, 
-                }
-            })
-            .then((result) => {
-                console.log('Reservation created ..')
-            })
-            .catch((err) =>{
-                console.log(err)
-            })
-       }
-
-   
-    
-    
-    }
-
-
-}
 
 
 async function inserer_profs(req , res){
@@ -606,21 +812,3 @@ async function inserer_profs(req , res){
 
 
 
-function ExcelDateToJSDate(serial) {
-    var utc_days  = Math.floor(serial - 25569);
-    var utc_value = utc_days * 86400;                                        
-    var date_info = new Date(utc_value * 1000);
- 
-    var fractional_day = serial - Math.floor(serial) + 0.0000001;
- 
-    var total_seconds = Math.floor(86400 * fractional_day);
- 
-    var seconds = total_seconds % 60;
- 
-    total_seconds -= seconds;
- 
-    var hours = Math.floor(total_seconds / (60 * 60));
-    var minutes = Math.floor(total_seconds / 60) % 60;
- 
-    return new Date(date_info.getFullYear(), date_info.getMonth(), date_info.getDate() + 1);
- }

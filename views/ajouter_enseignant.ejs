@@ -1,0 +1,45 @@
+<%- include('./partials/header.ejs') %>
+<body>
+    <div class="container">
+
+            <%- include('./partials/navbars/sp_navbar.ejs') %>
+            
+            <section class="menu">
+                <div class="profilePage">
+                    <form action="" method="post">
+                        <div class="output">
+                            <p>Nom</p>
+                            <input type="text" placeholder="nom"  name="nom" required>
+                        </div>
+                        <div class="output">
+                            <p>Prenom</p>
+                            <input type="text" placeholder="prenom"  name="prenom" required>
+                        </div>
+                        <div class="output">
+                            <p>Email</p>
+                            <input type="email" placeholder="example@gmail.com"  name="email" required>
+                        </div>
+                        <div class="output">
+                            <p>Grade</p>
+                            <select name="grade" id="grade" required>
+                                <option value="MCA">MCA</option>
+                                <option value="MCB">MCB</option>
+                                <option value="MAA">MAA</option>
+                                <option value="MAB">MAB</option>
+                                <option value="VACA">Vacataire</option>
+                                <option value="PROF">Professeur</option>
+                            </select>
+                        </div>
+                        <button type="submit">Ajouter</button>
+                    </form>
+                </div>
+            </section>
+        </section>
+    </div>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap');
+    </style>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<%- include('./partials/header.ejs') %>
+<body>
+    <div class="container">
+
+            <%- include('./partials/navbars/sp_navbar.ejs') %>
+            
+            <section class="menu">
+                <div class="compte">
+                    <div class="comptehead">
+                        <p>Créer un compte</p>
+                    </div>
+                    <form action="" method="post">
+                        <div class="compteinfo">
+                            <p>Username</p>
+                            <input type="text" placeholder="username" name="username" required>
+                        </div>
+                        <div class="compteinfo">
+                            <p>Mot de passe</p>
+                            <input type="password" placeholder="*********" name="password" required>
+                        </div>
+                        <div class="compteinfo">
+                            <p>Type de compte</p>
+                            <select name="type" id="grade">
+                                <option value="SP">Agent administratif</option>
+                                <%
+                                  for(let index in departements){%>
+                                    <option value="<%= departements[index].code_departement%>">Agent planificateur (<%= departements[index].code_departement%>)</option>
+                                  <%}
+                                %>
+                                <option value="SC">Agent de suivi des enseignements et l'évaluation</option>
+                                <option value="VD">Vice decanat</option>
+                            </select>
+                        </div>
+                        <button type="submit">Terminer</button>
+                    </form>
+                    <%
+                    if(message != null){%>
+                        <p><%=message%></p>
+                    <%}
+                    %>
+                </div>
+            </section>
+        </section>
+    </div>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap');
+    </style>
+</body>
+</html>

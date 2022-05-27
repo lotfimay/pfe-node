@@ -1,0 +1,45 @@
+<%- include('./partials/header.ejs') %>
+<body>
+    <div class="container">
+
+            <%- include('./partials/navbars/sp_navbar.ejs') %>
+            
+            <section class="menu">
+                <div class="profilePage">
+                    <form action="" method="post">
+                        <div class="output">
+                            <p>Nom</p>
+                            <input type="text" placeholder="<%=enseignant.nom_enseignant%>" value="<%=enseignant.nom_enseignant%>" name="nom">
+                        </div>
+                        <div class="output">
+                            <p>Prenom</p>
+                            <input type="text" placeholder="<%=enseignant.prenom_enseignant%>" value="<%=enseignant.prenom_enseignant%>" name="prenom">
+                        </div>
+                        <div class="output">
+                            <p>Email</p>
+                            <input type="email" placeholder="" value="<%=enseignant.email%>" name="email">
+                        </div>
+                        <div class="output">
+                            <p>Grade</p>
+                            <select name="grade" id="grade">
+                                <option value="<%=enseignant.code_grade%>"><%=enseignant.code_grade%></option>
+                                
+                                <%
+                                for(let index in autre_grades){%>
+                                    <option value="<%=autre_grades[index].code_grade%>"><%=autre_grades[index].code_grade%></option>
+                                <%}%>
+                            </select>
+                        </div>
+                        <button type="submit">Modifier</button>
+                    </form>
+                </div>
+            </section>
+        </section>
+    </div>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap');
+    </style>
+</body>
+</html>

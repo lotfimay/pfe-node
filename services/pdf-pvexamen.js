@@ -8,12 +8,12 @@ function PVexamen(dataCallback, endCallback, invoice) {
   doc.on('data', dataCallback);
   doc.on('end', endCallback);
 
-  generateheader(doc);
-  tablehead(doc);
+  generateheader(doc , invoice);
+  tablehead(doc , invoice);
   generateInvoiceTable(doc, invoice);
   doc.end();
 }
-function generateheader(doc){
+function generateheader(doc , invoice){
     doc.fill('#808080').stroke();
     doc
         .image("header.png", 40, 0, { width: 550, alignContent: 'center',})
@@ -24,29 +24,29 @@ function generateheader(doc){
         .fontSize(20)
         .text("P.V d'examen", 250,180, {width: 450})
         .fontSize(16)
-        .text("Semestre 1 Session 1         Année Universitaire : 2021 / 2022", 20,320, {width: 450})
+        .text(`Semestre ${invoice.semestre} Session ${invoice.session}         Année Universitaire : ${invoice.annee_universitaire}`, 20,320, {width: 450})
         .fontSize(14)
         .moveDown();
     doc.rect(250, 220, 300, 85).fillAndStroke('#fff', '#808080');
     doc.fill('#808080').stroke();
     doc.fontSize(14);
-    doc.text("Mr. NomEnseignant", 270, 230, {lineBreak: false} );
-    doc.text("Responsable de module : ", 270, 255, {lineBreak: false} );
-    doc.text("L2 section A", 270, 280, {lineBreak: false} );
+    doc.text("Mr. "+ invoice.chargeCours, 270, 230, {lineBreak: false} );
+    doc.text("Responsable de module : " + invoice.code_module, 270, 255, {lineBreak: false} );
+    doc.text( invoice.Section.niveau + " " + invoice.Section.code_specialite + " Section " + invoice.Section.nom_section , 270, 280, {lineBreak: false} );
 }
-function tablehead(doc){
+function tablehead(doc , invoice){
     doc.fontSize(12);
     doc.fill('#000').stroke();
     doc.rect(80, 350, 150, 40).fillAndStroke('#fff', '#000');
     doc.fill('#000').stroke();
-    doc.text("Date 10-15-2020 a 10:15", 90, 360, {lineBreak: false} );
+    doc.text("Date "+invoice.Creneau.date+" a " + invoice.Creneau.start_time, 90, 360, {lineBreak: false} );
     doc.rect(230, 350, 160, 40).fillAndStroke('#fff', '#000');
     doc.fill('#000').stroke();
-    doc.text("Locaux: 315D+151D+105D", 240, 360, {lineBreak: false} );
+    doc.text("Locaux: "+invoice.locaux, 240, 360, {lineBreak: false} );
     doc.rect(390, 350, 160, 40).fillAndStroke('#fff', '#000');
     doc.fill('#000').stroke();
-    doc.text("Module: ALGO", 400, 355, {lineBreak: false} );
-    doc.text("Section: A", 400, 375, {lineBreak: false} );
+    doc.text("Module: " + invoice.code_module, 400, 355, {lineBreak: false} );
+    doc.text("Section: " + invoice.Section.code_specialite, 400, 375, {lineBreak: false} );
     doc.rect(80, 390, 150, 30).fillAndStroke('#fff', '#000');
     doc.fill('#000').stroke();
     doc.text("Surveillants", 130, 400, {lineBreak: false} );
@@ -103,13 +103,13 @@ function generateInvoiceTable(doc, invoice) {
 	let i,
 		invoiceTableTop = 400;
 
-	for (i = 0; i < invoice.items.length; i++) {
-		const item = invoice.items[i];
+	for (i = 0; i < invoice.surveillants.length; i++) {
+		const item = invoice.surveillants[i];
 		const position = invoiceTableTop + (i + 1) * 30;
 		generateTableRow(
 			doc,
 			position,
-			item.Nom,
+			item,
 		);
 	}
 }

@@ -1,0 +1,43 @@
+<%- include('./partials/header.ejs') %>
+<body>
+    <div class="container">
+        <%- include('./partials/navbars/sc_navbar.ejs') %>
+        <section class="menu">
+          <div class="box">
+            <div class="insidebox semestre">
+                <p>Choisit le semestre :</p>
+                <select name="semestre" id="semestre">
+                    <option value="1">Semestre 1</option>
+                    <option value="2">Semestre 2</option>
+                </select>
+            </div>
+            <div class="insidebox session">
+                <p>Choisit la session :</p>
+                <select name="session" id="session">
+                    <option value="1">Examen</option>
+                    <option value="2">Rattrapage</option>
+                </select>
+            </div>
+            <div class="button">
+                <button id="confirm">Confirmer</button>
+            </div>
+          </div>
+
+        </section>
+    </div>
+
+    <script>
+     document.getElementById('confirm').addEventListener('click' , () =>{
+         const semestre = $("#semestre").val();
+         const session = $("#session").val();
+
+         window.location.href = `/enseignants/generer-convocations/${semestre}/${session}`;
+     })
+    </script>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap');
+    </style>
+</body>
+</html>

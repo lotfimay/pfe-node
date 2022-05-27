@@ -41,6 +41,8 @@ model Examen {
   code_module  String        @db.VarChar(30)
   code_section String        @db.VarChar(30)
   code_creneau BigInt
+  semestre     Int
+  session      Int
   Creneau      Creneau       @relation(fields: [code_creneau], references: [code_creneau], onDelete: Cascade, onUpdate: NoAction, map: "FK_EXAMEN_CRENEAU")
   Module       Module        @relation(fields: [code_module], references: [code_module], onDelete: Cascade, onUpdate: NoAction, map: "FK_EXAMEN_MODULE")
   Section      Section       @relation(fields: [code_section], references: [code_section], onDelete: Cascade, onUpdate: NoAction, map: "FK_EXAMEN_SECTION")
@@ -151,4 +153,12 @@ model ChargeCours {
 
   @@id([code_section, code_module, code_enseignant], map: "PK_CHARGECOURS")
   @@unique([code_section, code_module], map: "UNIQUE_SECTION_MODULE_CHARGECOURS")
+}
+
+model users {
+  user_id   BigInt  @id(map: "pk_users") @default(autoincrement())
+  user_name String  @unique(map: "unique_username") @db.VarChar(200)
+  email     String? @unique(map: "UNIQUE_EMAIL") @db.VarChar(200)
+  password  String  @db.VarChar(200)
+  type      String  @db.VarChar(20)
 }

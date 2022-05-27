@@ -8,12 +8,12 @@ function buildPDF(dataCallback, endCallback, invoice) {
   doc.on('data', dataCallback);
   doc.on('end', endCallback);
 
-  generateheader(doc);
+  generateheader(doc , invoice);
   tablehead(doc);
   generateInvoiceTable(doc, invoice);
   doc.end();
 }
-function generateheader(doc){
+function generateheader(doc , invoice){
     doc
         .image("header.png", 40, 0, { width: 550, alignContent: 'center',})
         .font('Times-Roman')
@@ -22,9 +22,9 @@ function generateheader(doc){
         .fontSize(18)
         .text("Convocation des surveillances d’examen", 300,180, {width: 450, borderTopWidth: 2, borderTopColor: 'black'})
         .fontSize(16)
-        .text("Semestre 1 Session 1         Année Universitaire : 2021 / 2022", 20,220, {width: 450})
+        .text(`Semestre ${invoice.semestre} Session ${invoice.session}         Année Universitaire : ${invoice.annee_universitaire}`, 20,220, {width: 450})
         .fontSize(14)
-        .text("Mr. NomEnseignant", 270, 270)
+        .text(`Mr. ${invoice.Enseignant.nom_enseignant} ${invoice.Enseignant.prenom_enseignant}`, 270, 270)
         .fontSize(12)
         .text("Vous êtes affecté pour Surveiller:", 110, 300)
         .moveDown();
@@ -49,16 +49,16 @@ function generateInvoiceTable(doc, invoice) {
 	let i,
 		invoiceTableTop = 360;
 
-	for (i = 0; i < invoice.items.length; i++) {
-		const item = invoice.items[i];
+	for (i = 0; i < invoice.surveillances.length; i++) {
+		const item = invoice.surveillances[i];
 		const position = invoiceTableTop + (i + 1) * 30;
 		generateTableRow(
 			doc,
 			position,
 			item.date,
-			item.horaire,
-			item.module,
-			item.salles,
+			item.start_time,
+			item.code_module,
+			item.locaux_presentation,
 		);
 	}
 }

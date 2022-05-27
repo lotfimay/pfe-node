@@ -5,6 +5,12 @@
         <section class="menu">
             <div class="cardModify">
                 <form action="" method="post">
+                    <div class="section">
+                        <h2>Section :</h2>
+                        <select name="secion" id="section">
+                            <option value="<%= section.code_section %>"><%= section.code_section  %> </option>
+                        </select>
+                    </div>
                     <div class="module">
                         <h2>Module :</h2>
                         <select name="module" id="module">
@@ -65,6 +71,7 @@
         $("#creneau").change(function(){
            const creneau = $(this).val();
            const my_module = $("#module").val();
+           const section = $("#section").val();
            if(creneau != 'empty'){
 
            
@@ -74,7 +81,7 @@
             method : 'GET' ,
             data: {
                 'code_creneau':creneau,
-                'section' : 'L3ISILA',
+                'section' : section,
                 'module' : my_module,
             },
             success:function(data){

@@ -85,7 +85,7 @@ body{
 }
 .menu .box{
     width: 70%;
-    height: 80%;
+    height: 95%;
     display: flex;
     flex-direction: column;
     border: 2px solid #1D6F42;
@@ -349,7 +349,6 @@ a{
     cursor: pointer;
     font-size: 15px;
     font-family: 'Poppins';
-    text-transform: uppercase;
 }
 a{
     text-decoration: none;
@@ -428,7 +427,7 @@ a{
 .menu .table .print .thead .box-table button{
     background-color: #1D6F42;
     height: 4vh;
-    width: 80%;
+    width: 100%;
     border-radius: 10px;
     color: whitesmoke;
     font-weight: 600;
@@ -437,7 +436,6 @@ a{
     font-size: 12px;
     text-align: center;
     font-family: 'Poppins';
-    text-transform: uppercase;
 }
 .menu .table .generate button{
     background-color: #1D6F42;
@@ -450,8 +448,220 @@ a{
     cursor: pointer;
     font-size: 15px;
     font-family: 'Poppins';
-    text-transform: uppercase;
 }
 a{
     text-decoration: none;
+}
+.menu .compte{
+    background-color: white;
+    display: flex;
+    align-items: center;
+    height: 75%;
+    width: 50%;
+    border: 2px solid #1D6F42;
+    border-radius: 5px;
+    flex-direction: column;
+}
+.menu .compte .comptehead{
+    margin-right: auto;
+    font-size: 25px;
+    color: #1D6F42;
+    font-weight: 600;
+    margin-left: 1em;
+}
+.menu .compte form .compteinfo input{
+    border: 2px solid #1D6F42;
+    width: 100%;
+    padding: 5px;
+    border-radius: 5px;
+}
+.menu .compte form .compteinfo p{
+    font-weight: 600;
+}
+.menu .compte form .compteinfo select{
+    border: 2px solid #1D6F42;
+    width: 104%;
+    padding: 5px;
+    border-radius: 5px;
+}
+.menu .compte form button{
+    width: 104%;
+    border: 1px solid #1D6F42;
+    outline: none;
+    background-color: #1D6F42;
+    border-radius: 5px;
+    padding: 5px;
+    font-family: 'Poppins';
+    color: white;
+    font-weight: 600;
+    margin-top: 2em;
+}
+.menu .gestion{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+}
+.menu .gestion .topmenu{
+    display: flex;
+    height: 5%;
+    margin-left: auto;
+    margin-top: 1em;
+    margin-right: 1em;
+}
+.menu .gestion .topmenu a{
+    outline: none;
+    border: 2px solid #1D6F42;
+    background-color: white;
+    color: #1D6F42;
+    font-weight: 600;
+    font-size: 13px;
+    text-transform: uppercase;
+    padding: 4px 7px;
+    border-radius: 5px;
+    margin-right: 3em;
+    cursor: pointer;
+    text-decoration: none;
+}
+.menu .gestion .topmenu .form{
+    display: flex;
+    align-items: center;
+    margin-top: -0.1em;
+}
+.menu .gestion .topmenu .form form input{
+    border: 2px solid #1D6F42;
+    padding: 5px;
+    font-size: 15px;
+    color: #1D6F42;
+    font-weight: 500;
+    padding-left: 0.5em;
+    border-top-left-radius: 5px;
+    border-bottom-left-radius: 5px;
+} 
+.menu .gestion .topmenu .form .searchicon button{
+    display: flex;
+    align-items: center;
+    background-color: #1D6F42;
+    color: white;
+    padding: 5px;
+    cursor: pointer;
+    margin-left: -0.4em;
+    font-size: 17px;
+    border: 2px solid #1D6F42;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+.menu .gestion .listeEns{
+    height: 95%;
+    width: 100%;
+    margin-top: 1em;
+}
+.menu .gestion .listeEns .thead{
+    height: 10%;
+    width: 96%;
+    font-weight: 600;
+    background-color: #b5cebc;
+    margin-left: 1em;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding-left: 1em;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+.menu .gestion .listeEns .thead .prenom{
+    margin-left: -1.5em;
+}
+.menu .gestion .listeEns .thead .nom{
+    margin-left: -2.8em;
+}
+
+.menu .gestion .listeEns .tbody{
+    height: 84%;
+    width: 97.5%;
+    overflow-y: scroll;
+    background-color: #a3c1ad;
+    margin-left: 1em;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    border-top-right-radius: 5px;
+}
+.menu .gestion .listeEns .tbody .EnseignantLad{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-left: 1em;
+    padding-right: 1em;
+    color: #4a3143;
+    font-weight: 600;
+}
+.menu .gestion .listeEns .tbody .EnseignantLad button{
+    outline: none;
+    border: 1px solid #a3c1ad;
+    background-color: #a3c1ad;
+    font-size: 17px;
+    cursor: pointer;
+}
+.menu .gestion .listeEns .tbody .EnseignantLad p{
+    width: 16%;
+}
+.menu .gestion .listeEns .tbody::-webkit-scrollbar{
+    width: 0.8em;
+}
+.menu .gestion .listeEns .tbody::-webkit-scrollbar-track{
+    background: #a3c1ad;
+    border-right: 1px solid white;
+    border-radius: 10px;
+}
+.menu .gestion .listeEns .tbody::-webkit-scrollbar-thumb{
+    background-color: #2e8b57;
+    border-radius: 10px;
+    border: 1px solid #1D6F42;
+}
+.trash{
+    color: red;
+}
+.menu .profilePage{
+    display: flex;
+    border: 2px solid #1D6F42;
+    justify-content: center;
+    align-items: center;
+    height: 80%;
+    width: 40%;
+    border-radius: 5px;
+}
+.menu .profilePage form .output{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    font-weight: 600;
+}
+.menu .profilePage form .output input{
+    border: 2px solid #1D6F42;
+    padding: 5px;
+    width: 140%;
+    margin-top: -0.8em;
+    border-radius: 5px;
+}
+.menu .profilePage form .output select{
+    border: 2px solid #1D6F42;
+    width: 150%;
+    margin-top: -0.8em;
+    padding: 5px;
+    border-radius: 5px;
+}
+.menu .profilePage form button{
+    width: 100%;
+    margin-top: 1.5em;
+    padding: 5px;
+    background-color: #1D6F42;
+    border: 1px solid #1D6F42;
+    outline: none;
+    border-radius: 5px;
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Poppins';
+    text-transform: uppercase;
 }

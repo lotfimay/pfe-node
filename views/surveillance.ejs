@@ -11,6 +11,13 @@
                             <option value="2">Semestre 2</option>
                         </select>
                     </div>
+                    <div class="insidebox semestre">
+                        <p>Choisit la session :</p>
+                        <select name="session" id="session">
+                            <option value="1">Examen</option>
+                            <option value="2">Rattrapage</option>
+                        </select>
+                    </div>
                     <div class="insidebox palier">
                         <p>Choisit le palier :</p>
                         <div class="form">
@@ -58,6 +65,7 @@
     </div>
     
     <script>
+
         $("#palier").change(function(){
            const palier = $(this).val();
            let flag = false;
@@ -99,10 +107,14 @@
                       $("#section").html(data);
                       const section  = $("#section").val();
                       const url = '/ajax/modules__par__section'
+                      const semestre  = $("#semestre").val();
+                      const session = $("#session").val();
                         $.ajax({
                             url :url,
                             data : {
-                            'code_section' : section
+                            'code_section' : section,
+                            'semestre' : semestre,
+                            'session' : session,
                             },
                             success : function(data){
                                     $("#module").html(data);
@@ -136,11 +148,15 @@
             success:function(data){
             $("#section").html(data);
                  const section  = $("#section").val();
+                 const semestre  = $("#semestre").val();
+                 const session = $("#session").val();
                  const second_url = '/ajax/modules__par__section'
                 $.ajax({
                     url :second_url,
                     data : {
-                        'code_section' : section
+                        'code_section' : section,
+                        'semestre' : semestre ,
+                        'session' : session,
                     },
                     success : function(data){
                         $("#module").html(data);
@@ -158,11 +174,15 @@
         });
         $("#section").change(function(){
             const section  = $("#section").val();
+            const semestre  = $("#semestre").val();
+            const session = $("#session").val();
             const url = '/ajax/modules__par__section'
             $.ajax({
                 url :url,
                 data : {
-                    'code_section' : section
+                    'code_section' : section,
+                    'semestre' : semestre,
+                    'session' : session,
                 },
                 success : function(data){
                     $("#module").html(data);
@@ -183,7 +203,8 @@
             const semestre = $("#semestre").val();
             const section = $("#section").val();
             const module = $("#module").val();
-            window.location.href = `/surveillance/${semestre}/${section}/${module}`
+            const session = $("#session").val();
+            window.location.href = `/surveillance/${semestre}/${session}/${section}/${module}`
     
 
         });

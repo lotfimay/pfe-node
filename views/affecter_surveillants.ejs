@@ -34,6 +34,13 @@
                             <div class="scroll">
                                 <div class="checkbox">
                                     <%
+                                       for(let index in enseignants_existent){%>
+                                        <div class="label">
+                                          <label for="surveillant"><%=enseignants_existent[index].Enseignant.nom_enseignant%> <%=enseignants_existent[index].Enseignant.prenom_enseignant%> ( <%=enseignants_existent[index].nb%> )</label>
+                                          <input type="checkbox" name="surveillant" id="surveillant" value="<%=enseignants_existent[index].Enseignant.code_enseignant%>" checked>  
+                                        </div>
+                                       <%}%>
+                                    <%
                                     for(let index in enseignants){%>
                                       <div class="label">
                                           <label for="surveillant"><%=enseignants[index].nom_enseignant%> <%=enseignants[index].prenom_enseignant%> ( <%=enseignants[index].nb%> )</label>

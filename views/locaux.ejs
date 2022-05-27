@@ -9,7 +9,7 @@
                    <div class="scroll">
                        <% 
                        for(let index in locaux){%>
-                        <a href="/surveillance/<%=semestre%>/<%=section%>/<%=module%>/<%=locaux[index].Local.code_local%>">
+                        <a href="/surveillance/<%=semestre%>/<%=session%>/<%=section%>/<%=module%>/<%=locaux[index].Local.code_local%>">
                             <div class="cardM">
                                     <p><%= locaux[index].Local.code_local%> (<%= locaux[index].Local.capacite%>)</p>   
                                     <ion-icon name="add-circle-outline"></ion-icon>

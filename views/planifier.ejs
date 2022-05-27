@@ -11,6 +11,13 @@
                             <option value="2">Semestre 2</option>
                         </select>
                     </div>
+                    <div class="insidebox session">
+                        <p>Choisit la session :</p>
+                        <select name="session" id="session">
+                            <option value="1">Examen</option>
+                            <option value="2">Rattrapage</option>
+                        </select>
+                    </div>
                     <div class="insidebox palier">
                         <p>Choisit le palier :</p>
                         <div class="form">
@@ -120,6 +127,24 @@
             }
            })
         });
+        $("#specialite").change(function(){
+            let val = $(this).val();
+            let niveau = $("#niveau").val();
+            const url = "/ajax/sections_par_niveau";
+            $.ajax({
+            url:url,
+            data:{
+            'code_specialite':val,
+            'niveau' : niveau
+            },
+            success:function(data){
+            $("#section").html(data);
+            },
+            error:function(error){
+                console.log(error)
+            }
+           })
+        })
         
         document.getElementById('confirm').addEventListener('click' , () =>{
 
@@ -129,7 +154,8 @@
 
             const semestre = $("#semestre").val();
             const section = $("#section").val();
-            window.location.href = `/planifier/${semestre}/${section}`
+            const session = $("#session").val();
+            window.location.href = `/planifier/${semestre}/${session}/${section}`
     
 
         });

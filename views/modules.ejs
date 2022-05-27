@@ -4,17 +4,43 @@
         <%- include('./partials/navebar.ejs') %>
         <section class="menu">
             <div class="modules">
-                <h2>Les modules :</h2>
+                <%
+                  if(flag == 'planifier'){%>
+                    <h2>Les modules :</h2>
+                  <%}
+                %>
+
+                <%
+                 if(flag == 'update'){%>
+                    <h2>Les examens :</h2>
+                 <%}%>
+                
                 <div class="cards">
                    <div class="scroll">
                        <% 
                        for(let index in modules){%>
-                        <a href="/planifier/<%=semestre%>/<%=section%>/<%= modules[index].code_module%>">
-                            <div class="cardM">
-                                    <p><%= modules[index].nom_module%></p>   
-                                    <ion-icon name="add-circle-outline"></ion-icon>
-                            </div>
-                       </a> 
+                        <%
+                         if(flag == 'planifier'){%>
+
+                            <a href="/planifier/<%=semestre%>/<%=session%>/<%=section%>/<%= modules[index].code_module%>">       
+                                <div class="cardM">
+                                        <p><%=modules[index].nom_module%></p>   
+                                        <ion-icon name="add-circle-outline"></ion-icon>
+                                </div>
+                            </a> 
+
+                         <%}%>
+                         <%
+                         if(flag == 'update'){%>
+                            <a href="/planifier/update/<%=semestre%>/<%=session%>/<%=section%>/<%= modules[index].Module.code_module%>">       
+                                <div class="cardM">
+                                        <p><%=modules[index].Module.nom_module%></p>   
+                                        <ion-icon name="add-circle-outline"></ion-icon>
+                                </div>
+                            </a> 
+                         <%}%>
+
+
                     <%}%>
                    </div>
                 </div>

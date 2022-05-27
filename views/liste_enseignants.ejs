@@ -1,0 +1,82 @@
+<%- include('./partials/header.ejs') %>
+<body>
+    <div class="container">
+
+           <%
+            if(user.type == 'VD'){%>
+                <%- include('./partials/navbars/vd_navbar.ejs') %>
+            <%}%>
+            <%
+            if(user.type == 'SP'){%>
+                <%- include('./partials/navbars/sp_navbar.ejs') %>
+            <%}%>
+            
+            <%
+            if(user.type == 'SC'){%>
+                <%- include('./partials/navbars/sc_navbar.ejs') %>
+            <%}%>
+            
+
+            <section class="menu">
+                <div class="gestion">
+                    <div class="topmenu">
+                        <%
+                        if(user.type == 'SP'){%>
+                            <div class="ajouterEn">
+                                <a href="/enseignants/ajouter-enseignant">Ajouter un enseignant</a>
+                            </div>
+                        <%}%>
+                        <div class="form">
+                            <form action="" method="get">
+                                <input type="text" placeholder="Rechercher un enseignant" name="q">
+                            </form>
+                            <div class="searchicon">
+                                <button type="submit"><ion-icon name="search-outline"></ion-icon></button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="listeEns">
+                        <div class="thead">
+                            <p>Matricule</p>
+                            <p class="nom">Nom</p>
+                            <p class="prenom">Prénom</p>
+                            <p class="grade">Grade</p>
+                            <p></p>
+                        </div>
+                        <div class="tbody">
+                            <%
+                              for(let index in enseignants){%>
+                                <div class="EnseignantLad">
+                                <p><%=enseignants[index].code_enseignant%></p>
+                                <p><%=enseignants[index].nom_enseignant%></p>
+                                <p><%=enseignants[index].prenom_enseignant%></p>
+                                <p><%=enseignants[index].code_grade%></p>
+                                <%
+                                  if(user.type == 'SP'){%>
+                                    <a href="/enseignants/<%=enseignants[index].code_enseignant%>"> <button><ion-icon name="create-outline"></ion-icon></button></a>
+                                  <%}%>
+
+                                  <%
+                                   if(user.type == 'SC'){%>
+                                    <a href="/<%=semestre%>/<%=session%>/<%=enseignants[index].code_enseignant%>/convocation"> <button><ion-icon name="create-outline"></ion-icon></button></a>
+                                   <%}%>
+                                  <%
+                                   if(user.type == 'SP'){%>
+                                    <a href="/enseignants/<%=enseignants[index].code_enseignant%>/delete/"><button><ion-icon class="trash" name="trash-outline"></ion-icon></button></a>
+                                   <%}%>
+        
+                            </div>
+                              <%}%>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </section>
+    </div>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap');
+    </style>
+</body>
+</html>

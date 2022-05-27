@@ -1,20 +1,7 @@
 <%- include('./partials/header.ejs') %>
 <body>
     <div class="container">
-        <%
-        if(user.type == 'SI' || user.type == 'IA'){%>
-          <%- include('./partials/navebar.ejs') %> 
-        <%}%>
-      
-        <%
-        if(user.type == 'VD'){%>
-          <%- include('./partials/navbars/vd_navbar.ejs') %>
-        <%}%>
-
-        <%
-         if(user.type == 'SC'){%>
-          <%- include('./partials/navbars/sc_navbar.ejs') %>
-        <%}%>
+        <%- include('./partials/navebar.ejs') %>
         <section class="menu">
             <div class="box">
                     <div class="insidebox semestre">
@@ -24,11 +11,11 @@
                             <option value="2">Semestre 2</option>
                         </select>
                     </div>
-                    <div class="insidebox semestre">
+                    <div class="insidebox session">
                         <p>Choisit la session :</p>
                         <select name="session" id="session">
-                            <option value="1">Examen</option>
-                            <option value="2">Rattrapage</option>
+                            <option value="1">Session 1</option>
+                            <option value="2">Session 2</option>
                         </select>
                     </div>
                     <div class="insidebox palier">
@@ -61,7 +48,6 @@
                             <option value="empty">---------------</option>
                         </select>
                     </div>
-
                     <div class="button">
                         <button id="confirm">Confirmer</button>
                     </div>
@@ -159,6 +145,7 @@
             }
            })
         })
+        
         document.getElementById('confirm').addEventListener('click' , () =>{
 
 
@@ -168,7 +155,7 @@
             const semestre = $("#semestre").val();
             const section = $("#section").val();
             const session = $("#session").val();
-            window.location.href = `/consulter/${semestre}/${session}/${section}`
+            window.location.href = `/planifier/update/${semestre}/${session}/${section}`
     
 
         });

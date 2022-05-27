@@ -156,10 +156,23 @@ router.get('/update_planification' , async (req , res) =>{
 });
 
 router.get('/specialites_par__palier', async (req , res) =>{
+
+    let arr = [];
+    if(req.user.type == 'IA'){
+       arr.push('IA');
+    }
+    if(req.user.type == 'SI'){
+        arr.push('SI');
+    }
+    if(req.user.type == 'VD' || req.user.type == 'SC'){
+        arr.push('IA');
+        arr.push('SI');
+    }
   
   let specialites = await prisma.specialite.findMany({
       where : {
-          palier : req.query.palier
+          palier : req.query.palier,
+          code_departement : {in : arr},
       }
   });
   
@@ -192,10 +205,14 @@ router.get('/sections_par_niveau' , async (req , res) =>{
 router.get('/modules__par__section' , async (req , res) => {
 
     console.log(req.query.code_section);
+    console.log(req.query.semestre);
+    console.log(req.query.session);
       
      let modules = await prisma.examen.findMany({
         where : {
             code_section : req.query.code_section,
+            semestre : parseInt(req.query.semestre),
+            session : parseInt(req.query.session),
         }
         , 
         select : {
