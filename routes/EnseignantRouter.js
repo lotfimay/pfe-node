@@ -1,9 +1,33 @@
 const express = require('express');
 const { PrismaClient }  = require('@prisma/client');
-const { append } = require('express/lib/response');
 const prisma = new PrismaClient();
 
+const bcrypt = require('bcrypt');
+
+
+
+const check_user = async(req , res , next) =>{
+    if(req.user.type != 'SP'){
+        return res.redirect('/');
+    }
+    else return next();
+}
+
+const check_user_2 = async(req , res , next) =>{
+    if(req.user.type == 'SC'){
+        return res.redirect('/');
+    }
+    else next();
+}
+
+
+
 const router = express.Router();
+
+
+
+
+
 
 router.get('/' ,async (req , res) =>{
 
@@ -46,18 +70,23 @@ router.get('/' ,async (req , res) =>{
         'user' : req.user,
     });
 
- });
+});
 
 
-router.get('/generer-convocations' , async (req , res) =>{
 
-    res.render('generer_convocations');
+router.get('/generer-convocations' ,check_user_2 ,async (req , res) =>{
+
+    
+
+    res.render('generer_convocations' ,{
+        'user' : req.user,
+    });
 
 
 });
 
 
-router.get('/generer-convocations/:semestre/:session/' , async (req , res) =>{
+router.get('/generer-convocations/:semestre/:session/' , check_user_2, async (req , res) =>{
 
     let q = req.query.q == undefined ? '' : req.query.q;
 
@@ -121,24 +150,33 @@ router.get('/generer-convocations/:semestre/:session/' , async (req , res) =>{
 
 });
 
-router.get('/ajouter-enseignant' , async (req , res) =>{
+router.get('/ajouter-enseignant' ,check_user ,async (req , res) =>{
    
     res.render('ajouter_enseignant' , {
         'user' : req.user,
     })
 });
 
-router.post('/ajouter-enseignant' , async (req , res) =>{
+router.post('/ajouter-enseignant' , check_user, async (req , res) =>{
     console.log(req.body);
 
     try{
         const new_enseignant = await prisma.enseignant.create({
             data : {
-                nom_enseignant : req.body.nom,
-                prenom_enseignant : req.body.prenom,
+                nom_enseignant : req.body.nom.toUpperCase(),
+                prenom_enseignant : req.body.prenom.toUpperCase(),
                 email : req.body.email,
                 code_grade : req.body.grade,
 
+            }
+        });
+        let enc_password = await bcrypt.hash(req.body.nom.toLowerCase() + '_' + req.body.prenom.toLowerCase() , 10)
+        const new_user = await prisma.users.create({
+            data : {
+                user_name : req.body.nom.toLowerCase() + '_' + req.body.prenom.toLowerCase(),
+                email : req.body.email,
+                type : 'ENS',
+                password : enc_password,
             }
         });
 
@@ -148,7 +186,7 @@ router.post('/ajouter-enseignant' , async (req , res) =>{
     res.redirect('/enseignants/')
 });
 
-router.get('/:enseignant_id' , async(req , res) =>{
+router.get('/:enseignant_id' ,check_user ,async(req , res) =>{
     
     const enseignant = await prisma.enseignant.findUnique({
         where : {
@@ -172,7 +210,8 @@ router.get('/:enseignant_id' , async(req , res) =>{
 
 });
 
-router.post('/:enseignant_id' , async (req , res) =>{
+
+router.post('/:enseignant_id' , check_user,async (req , res) =>{
 
     console.log(req.params.enseignant_id);
     
@@ -191,7 +230,7 @@ router.post('/:enseignant_id' , async (req , res) =>{
     return res.redirect('/enseignants/');
 });
 
-router.get('/:enseignant_id/delete' , async (req , res) =>{
+router.get('/:enseignant_id/delete' , check_user,async (req , res) =>{
   
     const deleted_user = await prisma.enseignant.delete({
         where : {
@@ -205,4 +244,11 @@ router.get('/:enseignant_id/delete' , async (req , res) =>{
 
 
 
+
+
 module.exports = router;
+
+
+
+
+

@@ -15,6 +15,11 @@
          if(user.type == 'SC'){%>
           <%- include('./partials/navbars/sc_navbar.ejs') %>
         <%}%>
+
+        <%
+         if(user.type == 'ENS'){%>
+          <%- include('./partials/navbars/ens_navbar.ejs') %>
+        <%}%>
         <section class="menu">
             <div class="box">
                     <div class="insidebox semestre">
@@ -64,6 +69,11 @@
 
                     <div class="button">
                         <button id="confirm">Confirmer</button>
+                    </div>
+                    <div class="errors">
+                        <ul id="errors-list">
+                            
+                        </ul>
                     </div>
             </div>
         </section>
@@ -164,11 +174,43 @@
 
 
             // controle
-
             const semestre = $("#semestre").val();
             const section = $("#section").val();
             const session = $("#session").val();
-            window.location.href = `/consulter/${semestre}/${session}/${section}`
+
+
+
+
+            const palier = $("#palier").val();
+            const specilate = $("#specialite").val();
+
+
+            if(palier == 'empty' || palier == null){
+                document.getElementById("errors-list")
+                .innerHTML = '<li>Sélectionner un  palier</li>' ;
+                return;
+            }
+
+            if(specilate == 'empty' || palier == null){
+                document.getElementById("errors-list")
+                .innerHTML = '<li>Sélectionner une specialite</li>'
+                return;
+            }
+
+            if(section == 'empty' || palier == null){
+                document.getElementById("errors-list")
+                .innerHTML = '<li>Sélectionner une section</li>'
+                return;
+            }
+
+            let type = '<%=user.type%>';
+            if(type == 'ENS'){
+                window.location.href = `/espace-enseignant/consulter/${semestre}/${session}/${section}`
+            }
+            else{
+                window.location.href = `/consulter/${semestre}/${session}/${section}`
+            }
+            
     
 
         });

@@ -7,11 +7,60 @@ const router = express.Router();
 
 
 
+const check_user = async(req , res , next) => {
+    if(req.user.type != 'IA' && req.user.type != 'SI'){
+       return res.redirect('/');
+    }
+    else return next();
+};
+
+const check_user_2 = async(req , res , next) => {
+   if(req.user.type != 'IA' && req.user.type != 'SI' && req.user.type != 'VD'){
+      return res.redirect('/');
+   }
+   else return next();
+};
+
+const check_user_3 = async(req , res , next) =>{
+
+    if(req.user.type != 'VD'){
+        check_departement_coherence(req , res , next);        
+    }
+    else return next();
+}
+
+const check_departement_coherence = async(req , res , next) =>{
+    let departement = await prisma.section.findUnique({
+        where : {
+            code_section  : req.params.section_id,
+        },
+        select : {
+            Specialite : {
+                select : {
+                    Departement : {
+                        select : {
+                            code_departement : true,
+                        }
+                    }
+                }
+            }
+        }
+    });
+    if(departement.Specialite.Departement.code_departement != req.user.type){
+        return res.redirect('/');
+    }
+    else return next();
+}
+
+
+
 router.get('' , (req , res) => {
-    return res.render('surveillance');
+    return res.render('surveillance',{
+        'user' : req.user,
+    });
 });
 
-router.get('/:semestre_id/:session_id/:section_id/:module_id' , async (req , res) =>{
+router.get('/:semestre_id/:session_id/:section_id/:module_id' ,check_user , check_departement_coherence,async (req , res) =>{
 
     let locaux = await prisma.localExamen.findMany({
         where : {
@@ -33,12 +82,70 @@ router.get('/:semestre_id/:session_id/:section_id/:module_id' , async (req , res
         'session' : req.params.session_id,
         'section' : req.params.section_id,
         'module' : req.params.module_id,
+        'user' : req.user,
     });
 
 
 });
 
-router.get('/:semestre_id/:session_id/:section_id/:module_id/:local_id' , async (req , res)=>{
+router.get('/:semestre_id/:session_id/:section_id/:module_id/consulter' , check_user_2 , check_user_3 ,async (req ,res)=>{
+    let charge_cours = await prisma.chargeCours.findUnique({
+        where : {
+             code_section_code_module : {
+                code_section : req.params.section_id,
+                code_module : req.params.module_id,
+             }
+        },
+        select : {
+            Enseignant : {
+                select : {
+                    code_enseignant : true,
+                    nom_enseignant : true,
+                    prenom_enseignant : true,
+                }
+            }
+        }
+    });
+
+    let arr = [];
+    if(charge_cours != null){
+        arr.push(charge_cours.Enseignant.code_enseignant);
+    }
+    let surveillants = await prisma.surveillance.findMany({
+        where : {
+            LocalExamen : {
+                Examen : {
+                    semestre : parseInt(req.params.semestre_id),
+                    session : parseInt(req.params.session_id),
+                    code_section : req.params.section_id,
+                    code_module : req.params.module_id,   
+                }
+            },
+            code_enseignant : {notIn : arr}
+        },
+        select : {
+            Enseignant : {
+                select : {
+                    nom_enseignant : true,
+                    prenom_enseignant : true,
+                }
+            }
+        }
+    });
+
+    let data = new Object();
+
+    charge_cours == null ? data.charge_cours = "Charge Cours non insérer" : data.charge_cours = `${charge_cours.Enseignant.nom_enseignant} ${charge_cours.Enseignant.prenom_enseignant}`;
+    data.surveillants = surveillants;
+   return res.render('surveillances',{
+    'user' : req.user,
+    'data' : data,
+   });
+
+
+});
+
+router.get('/:semestre_id/:session_id/:section_id/:module_id/:local_id' ,check_user,check_departement_coherence ,async (req , res)=>{
 
     let my_module = await prisma.module.findUnique({
         where : {
@@ -47,9 +154,10 @@ router.get('/:semestre_id/:session_id/:section_id/:module_id/:local_id' , async 
     });
     let creneau = await prisma.examen.findUnique({
         where : {
-            code_section_code_module : {
+            code_section_code_module_session : {
                 code_module : req.params.module_id,
                 code_section : req.params.section_id,
+                session : parseInt(req.params.session_id),
             }
         },
         select : {
@@ -69,6 +177,21 @@ router.get('/:semestre_id/:session_id/:section_id/:module_id/:local_id' , async 
             code_local : req.params.local_id,
         }
     });
+
+    let charge_cours = await prisma.chargeCours.findUnique({
+        where : {
+         code_section_code_module : {
+             code_module : req.params.module_id,
+             code_section : req.params.section_id,
+         }
+        }
+     });
+
+    let arr = [];
+    if(charge_cours != null){
+        arr.push(charge_cours.code_enseignant);
+    }
+     
     
     let enseignant_interdits = await prisma.surveillance.findMany({
         select : {
@@ -84,6 +207,7 @@ router.get('/:semestre_id/:session_id/:section_id/:module_id/:local_id' , async 
             code_creneau : creneau.Creneau.code_creneau,
             code_section : req.params.section_id,
             code_local : req.params.local_id,
+            code_enseignant : {notIn : arr},
         },
         select : {
             Enseignant : {
@@ -152,16 +276,22 @@ router.get('/:semestre_id/:session_id/:section_id/:module_id/:local_id' , async 
     }
   
 
+
+
+
+
   return res.render('affecter_surveillants' ,{
       'module' : my_module,
       'creneau' : creneau,
       'local' : local,
       'enseignants' : enseignants,
-      'enseignants_existent' : enseignant_deja_selectionner
+      'enseignants_existent' : enseignant_deja_selectionner,
+      'user' : req.user,
+      
   });
 });
 
-router.post('/:semestre_id/:session_id/:section_id/:module_id/:local_id' , async (req , res) =>{
+router.post('/:semestre_id/:session_id/:section_id/:module_id/:local_id' , check_user,check_departement_coherence,async (req , res) =>{
    
 
    let deleted_surveillances = await prisma.surveillance.deleteMany({
@@ -198,9 +328,18 @@ router.post('/:semestre_id/:session_id/:section_id/:module_id/:local_id' , async
     }
     }  
 
-    res.redirect(`/surveillance/${req.params.semestre_id}/${req.params.session_id}/${req.params.section_id}/${req.params.module_id}`);
+    res.json(
+        {
+            'dest' : 
+            `/surveillance/${req.params.semestre_id}/${req.params.session_id}/${req.params.section_id}/${req.params.module_id}`
+        }
+        );
     
 });
+
+
+
+
 
 
 module.exports = router;

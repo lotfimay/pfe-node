@@ -1,0 +1,77 @@
+body{
+    display: flex;
+    flex-direction: row;
+    font-family: 'Poppins';
+    height: 100vh;
+    width: 100vw;
+    overflow-x: hidden;
+    overflow-y: hidden;
+    background-color: #dbdddb;
+}
+.container{
+    height: 100%;
+    width: 100vw;
+    display: flex;
+    flex-direction: row;
+    margin-top: -0.5em;
+    margin-left: -0.5em;
+    justify-content: center;
+    align-items: center;
+}
+.container .login{
+    width: 30%;
+    height: 60%; 
+    display: flex;
+    align-items: center;
+    border-radius: 10px;
+    flex-direction: column;
+    border: 2px solid #1D6F42;
+    background-color: white;
+}
+.container .login .loginHead{
+    margin-right: auto;
+    font-family: 'Poppins';
+    font-weight: 600;
+    color: #1D6F42;
+    font-size: 22px;
+    margin-left: 1em;
+}
+.container .login .loginbody{
+    margin-top: -1em;
+    width: 100%;
+}
+.container .login .loginbody form .loginclass{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.container .login .loginbody form .loginclass input{
+    width: 70%;
+    border: 2px solid #1D6F42;
+    padding: 5px;
+    border-radius: 5px;
+    margin-top: 4em;
+    height: 3vh;
+}
+.container .login .loginbody form .loginbutt{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.container .login .loginbody form button{
+    background-color: #1D6F42;
+    border: 1px solid #1D6F42;
+    outline: none;
+    color: white;
+    border-radius: 5px;
+    font-size: 17px;
+    font-family: 'Poppins';
+    margin-top: 2em;
+    width: 73%;
+}
+
+.container .login .loginbody .error{
+    margin: 1rem;
+    justify-content: center;
+}

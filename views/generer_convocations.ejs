@@ -1,7 +1,15 @@
 <%- include('./partials/header.ejs') %>
 <body>
     <div class="container">
-        <%- include('./partials/navbars/sc_navbar.ejs') %>
+        <%
+         if(user.type == 'SC'){%>
+            <%- include('./partials/navbars/sc_navbar.ejs') %>
+         <%}%>
+
+         <%
+          if(user.type == 'ENS'){%>
+            <%- include('./partials/navbars/ens_navbar.ejs') %>
+          <%}%>
         <section class="menu">
           <div class="box">
             <div class="insidebox semestre">
@@ -21,6 +29,9 @@
             <div class="button">
                 <button id="confirm">Confirmer</button>
             </div>
+            <div id="result">
+                   
+            </div>
           </div>
 
         </section>
@@ -30,9 +41,58 @@
      document.getElementById('confirm').addEventListener('click' , () =>{
          const semestre = $("#semestre").val();
          const session = $("#session").val();
+         
+         
+        let type = '<%=user.type%>';
+        if(type == 'ENS'){
+           console.log('I am here');
+           let email = '<%=user.email%>';
+           let code_enseignant = '<%=code_enseignant%>';
 
-         window.location.href = `/enseignants/generer-convocations/${semestre}/${session}`;
-     })
+           console.log(email);
+          
+           $.ajax({
+                    url : '/ajax/verify_convocation',
+                    data : {
+                        'code_enseignant' : code_enseignant,
+                        'semestre' : semestre,
+                        'session' : session
+                    },
+                    success : function(data){
+                                    if(data.data == true){
+                                        window.location.href = `/pdf/${semestre}/${session}/${code_enseignant}/convocation`;
+                                    }
+                                    else if(data.data == false){
+                                            if(document.getElementById('result').textContent == 'Vous êtes pas encore affecté pour surveiller'){
+                                                    document.getElementById('result').innerHTML = 
+                                                    '<p></p>';
+
+                                                    setTimeout(() =>{
+                                                        document.getElementById('result').innerHTML = 
+                                                        '<p>Vous êtes pas encore affecté pour surveiller</p>';
+                                                        } , 500)
+                                            }
+                                            else{
+                                                document.getElementById('result').innerHTML = 
+                                                '<p>Vous êtes pas encore affecté pour surveiller</p>';
+                                            }
+                                    }
+            },
+                    error : function(error){
+                         console.log(error);
+                    }
+           });
+            
+           //    window.location.href = `/pdf/${semestre}/${session}/${code_enseignant}/convocation`;
+        }
+        if(type == 'SC'){
+            window.location.href = `/enseignants/generer-convocations/${semestre}/${session}`;
+        }
+     });
+
+
+
+
     </script>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>

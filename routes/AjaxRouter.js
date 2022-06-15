@@ -164,7 +164,7 @@ router.get('/specialites_par__palier', async (req , res) =>{
     if(req.user.type == 'SI'){
         arr.push('SI');
     }
-    if(req.user.type == 'VD' || req.user.type == 'SC'){
+    if(req.user.type == 'VD' || req.user.type == 'SC' || req.user.type == 'ENS'){
         arr.push('IA');
         arr.push('SI');
     }
@@ -180,7 +180,6 @@ router.get('/specialites_par__palier', async (req , res) =>{
       'specialites' : specialites
   })
 });
-
 
 router.get('/sections_par_niveau' , async (req , res) =>{
 
@@ -249,5 +248,122 @@ router.get('/modules__par__section' , async (req , res) => {
 
 });
 
+router.delete('/examen' ,async (req , res) =>{
+
+
+    console.log(req.body);
+   
+    try{
+       let deleted_examen = await prisma.examen.deleteMany({
+           where : {
+               code_section : req.body.section,
+               code_module : req.body.module,
+               session : parseInt(req.body.session),
+           }
+       })
+
+        return res.json({
+            'message' : 'deleted successfully !'
+        })
+    }
+    catch(err){
+        console.log(err);
+        res.status(500).json({
+            'message' : 'something went wrong !'
+        })
+    }
+
+});
+router.delete('/enseignant' , async (req , res) =>{
+
+     try{
+         let deleted_enseignant = await prisma.enseignant.delete({
+             where : {
+                 code_enseignant : parseInt(req.body.code)
+             }
+         });
+         return res.json({'message' : 'deleted successfully'})
+     }catch(err){
+         return res.status(500).json({'message' : 'Something went wrong !'})
+     }
+});
+
+router.get('/verify_convocation' , async(req ,res) =>{
+   
+   console.log(req.query);
+
+   try{
+    let exists = await prisma.surveillance.findFirst({
+        where : {
+            code_enseignant : parseInt(req.query.code_enseignant),
+            LocalExamen : {
+            Examen:{
+                semestre : parseInt(req.query.semestre),
+                session : parseInt(req.query.session),
+            }
+        }
+        }
+    });
+
+    if(exists != null){
+        return res.json({'data' : true});
+    }
+    else res.json({'data' : false});
+
+   }catch(err){
+
+        res.status(500).json({'message' : 'Something went wrong !'});
+   }
+
+});
+
+router.get('/email__enseignant' , async(req , res) =>{
+
+  try{
+    let enseignant = await prisma.enseignant.findUnique({
+        where :{
+            email : req.query.email,
+        }
+    });
+    console.log(enseignant);
+    return res.json({'code_enseignant' : enseignant.code_enseignant.toString()})
+  }catch(error){
+    console.log(error);
+    return res.status(500).json({'error' : 'Something went wrong !'})
+  }
+
+
+});
+
+router.get('/pv__modules' , async(req , res) =>{
+
+
+    let tmp_modules = await prisma.chargeCours.findMany({
+        where : {
+            code_enseignant : parseInt(req.query.code_enseignant),
+        },
+        select :{
+            Module : true,
+        }
+    });
+    let modules_ids = tmp_modules.map(element => element.Module.code_module);
+    console.log(modules_ids);
+    let modules = await prisma.examen.findMany({
+        where : {
+            code_section : req.query.section,
+            session : parseInt(req.query.session),   
+            code_module : {in : modules_ids}         
+        },
+        select : {
+            Module : true,
+        }
+    });
+    console.log('Here');
+    console.log(modules);
+    return res.render('chained_drop_downs/modules' , {
+        'modules' : modules,
+    })
+
+});
 
 module.exports = router;

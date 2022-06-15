@@ -1,0 +1,42 @@
+<section class="navbare" id="navbare">
+    <div class="top">
+        <ion-icon name="settings-outline"></ion-icon>
+        <h1><%=user.nom_enseignant%> <%=user.prenom_enseignant%></h1>
+    </div>
+    <div class="buttons">
+        <div class="actions">
+
+            <%
+              if(is_charge == true){%>
+
+                <a href="/espace-enseignant/generer-pvs">
+                    <div class="action">
+                        <ion-icon name="eye-outline"></ion-icon>
+                        <p>Genérer un PV d'examen</p>
+                    </div>
+                </a>
+            <%}%>
+           
+                <a href="/espace-enseignant/generer-convocations">
+                    <div class="action">
+                        <ion-icon name="eye-outline"></ion-icon>
+                        <p>Genérer la convocation du surveillances</p>
+                    </div>
+                </a> 
+                <a href="/espace-enseignant/consulter">
+                    <div class="action">
+                        <ion-icon name="eye-outline"></ion-icon>
+                        <p>Consulter les emplois</p>
+                    </div>
+                </a> 
+        </div>
+        <div class="logout">
+            <a href="/logout/">
+                <div class="action">
+                    <ion-icon name="log-out-outline"></ion-icon>
+                    <p>Logout</p>
+                </div>
+            </a>
+        </div>
+    </div>
+</section>

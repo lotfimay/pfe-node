@@ -24,7 +24,7 @@ function generateheader(doc , invoice){
         .fontSize(16)
         .text(`Semestre ${invoice.semestre} Session ${invoice.session}         Année Universitaire : ${invoice.annee_universitaire}`, 20,220, {width: 450})
         .fontSize(14)
-        .text(`Mr. ${invoice.Enseignant.nom_enseignant} ${invoice.Enseignant.prenom_enseignant}`, 270, 270)
+        .text(`${invoice.Enseignant.nom_enseignant} ${invoice.Enseignant.prenom_enseignant}`, 270, 270)
         .fontSize(12)
         .text("Vous êtes affecté pour Surveiller:", 110, 300)
         .moveDown();

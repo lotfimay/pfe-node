@@ -28,7 +28,7 @@ model Enseignant {
   code_enseignant   BigInt         @id(map: "PK_ENSEIGNANT") @default(autoincrement())
   nom_enseignant    String         @db.VarChar(100)
   prenom_enseignant String         @db.VarChar(100)
-  email             String?        @db.VarChar(255)
+  email             String?        @unique(map: "UNIQUE_EMAIL") @db.VarChar(255)
   telephone_1       String?        @db.VarChar(10)
   telephone_2       String?        @db.VarChar(10)
   code_grade        String         @db.VarChar(30)
@@ -50,7 +50,7 @@ model Examen {
 
   @@id([code_module, code_section, code_creneau], map: "PK_EXAMEN")
   @@unique([code_section, code_creneau], map: "UNIQUE_SECTION_CRENEAU")
-  @@unique([code_section, code_module], map: "UNIQUE_SECTION_MODULE")
+  @@unique([code_section, code_module, session], map: "UNIQUE_SECTION_MODULE_SESSION")
 }
 
 model Grade {
@@ -158,7 +158,7 @@ model ChargeCours {
 model users {
   user_id   BigInt  @id(map: "pk_users") @default(autoincrement())
   user_name String  @unique(map: "unique_username") @db.VarChar(200)
-  email     String? @unique(map: "UNIQUE_EMAIL") @db.VarChar(200)
+  email     String? @db.VarChar(200)
   password  String  @db.VarChar(200)
   type      String  @db.VarChar(20)
 }

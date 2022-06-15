@@ -57,6 +57,11 @@
                     <div class="button">
                         <button id="confirm">Confirmer</button>
                     </div>
+                    <div class="errors">
+                        <ul id="errors-list">
+                            
+                        </ul>
+                    </div>
             </div>
         </section>
 
@@ -65,7 +70,58 @@
     </div>
     
     <script>
+       
+        $("#semestre").change(function(){
+            const semestre = $(this).val();
+            const section = $("#section").val();
+            const session = $("#session").val();
 
+            if(section != 'empty' && session != 'empty'){
+                const url = '/ajax/modules__par__section';
+                $.ajax({
+                        url :url,
+                        data : {
+                            'code_section' : section,
+                            'semestre' : semestre,
+                            'session' : session,
+                        },
+                        success : function(data){
+                                $("#module").html(data);
+                        },
+                        error : function(err){
+                                    console.log(err);
+                        }
+                    });
+            }
+
+        });
+        $("#session").change(function(){
+
+            const session = $(this).val();
+            const section = $("#section").val();
+            const semestre = $("#semestre").val();
+
+            if(section != 'empty' && semestre != 'empty'){
+                const url = '/ajax/modules__par__section';
+                $.ajax({
+                        url :url,
+                        data : {
+                            'code_section' : section,
+                            'semestre' : semestre,
+                            'session' : session,
+                        },
+                        success : function(data){
+                                $("#module").html(data);
+                        },
+                        error : function(err){
+                                    console.log(err);
+                        }
+                    });
+            }
+            
+            
+
+        })
         $("#palier").change(function(){
            const palier = $(this).val();
            let flag = false;
@@ -193,7 +249,43 @@
             })
             
         })
-
+        $("#specialite").change(function(){
+            let val = $(this).val();
+            let niveau = $("#niveau").val();
+            const url = "/ajax/sections_par_niveau";
+            $.ajax({
+            url:url,
+            data:{
+            'code_specialite':val,
+            'niveau' : niveau
+            },
+            success:function(data){
+            $("#section").html(data);
+            const section  = $("#section").val();
+            const semestre  = $("#semestre").val();
+            const session = $("#session").val();
+            const url = '/ajax/modules__par__section'
+            $.ajax({
+                url :url,
+                data : {
+                    'code_section' : section,
+                    'semestre' : semestre,
+                    'session' : session,
+                },
+                success : function(data){
+                    $("#module").html(data);
+                },
+                error : function(err){
+                     console.log(err);
+                }
+            })
+            
+            },
+            error:function(error){
+                console.log(error)
+            }
+           })
+        })
         document.getElementById('confirm').addEventListener('click' , () =>{
 
 
@@ -201,9 +293,46 @@
             // controle
 
             const semestre = $("#semestre").val();
+            const session = $("#session").val();
+
+
+            
+            const palier = $("#palier").val();
+            const specilate = $("#specialite").val();
+
             const section = $("#section").val();
             const module = $("#module").val();
-            const session = $("#session").val();
+
+            
+            if(palier == 'empty' || palier == null){
+                document.getElementById("errors-list")
+                .innerHTML = '<li>Sélectionner un  palier</li>' ;
+                return;
+            }
+
+            if(specilate == 'empty' || palier == null){
+                document.getElementById("errors-list")
+                .innerHTML = '<li>Sélectionner une specialite</li>'
+                return;
+            }
+
+            if(section == 'empty' || palier == null){
+                document.getElementById("errors-list")
+                .innerHTML = '<li>Sélectionner une section</li>'
+                return;
+            }
+
+            if(module == 'empty' || module == null){
+                document.getElementById("errors-list")
+                .innerHTML = '<li>Sélectionner une module</li>'
+                return;
+            }
+
+            
+
+
+
+
             window.location.href = `/surveillance/${semestre}/${session}/${section}/${module}`
     
 

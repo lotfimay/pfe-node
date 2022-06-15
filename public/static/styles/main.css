@@ -207,65 +207,75 @@ a{
     text-decoration: none;
 }
 
-.menu .cardModify{
+.menu .newbos{
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
     border: 2px solid #1D6F42;
     width: 40%;
     border-radius: 20px;
     padding-bottom: 1em;
     background-color: white;
+
 }
-.menu .cardModify h2{
+.menu .newbos .module, .menu .newbos .creneau, .menu .newbos .salle, .menu .newbos .section{
+    width: 80%;
+}
+
+
+.menu .newbos h2{
     font-size: 25px;
     font-weight: 500;
 }
-.menu .cardModify .salle .scroll .checkbox{
+.menu .newbos .salle .scroll .checkbox{
     display: flex;
     flex-direction: column;
 }
-.menu .cardModify .salle .scroll .checkbox .label{
+.menu .newbos .salle .scroll .checkbox .label{
     display: flex;
     align-items: center;
     justify-content: center;
 }
-.menu .cardModify .salle .scroll .checkbox .label label{
+.menu .newbos .salle .scroll .checkbox .label label{
     font-size: 15px;
     font-weight: 500;
 }
-.menu .cardModify .salle .scroll{
+.menu .newbos .salle .scroll{
     overflow-y: scroll;
     height: 20vh;
     border: 1px solid #1D6F42;
     border-radius: 10px;
 }
-.menu .cardModify button{
+.menu .newbos #confirm{
+    display: flex;
+    align-items: center;
+    justify-content: center;
     text-decoration: none;
     background-color: #1D6F42;
     color: whitesmoke;
     height: 5vh;
-    width: 100%;
+    width: 80% ;
     border: 1px solid #1D6F42;
     border-radius: 10px;
     margin-top: 1em;
     cursor: pointer;
 }
-.menu .cardModify .salle .scroll::-webkit-scrollbar{
+.menu .newbos .salle .scroll::-webkit-scrollbar{
     width: 0.8em;
 }
-.menu .cardModify .salle .scroll::-webkit-scrollbar-track{
+.menu .newbos .salle .scroll::-webkit-scrollbar-track{
     background: whitesmoke;
     border-right: 1px solid #1D6F42;
     border-radius: 10px;
 
 }
-.menu .cardModify .salle .scroll::-webkit-scrollbar-thumb{
+.menu .newbos .salle .scroll::-webkit-scrollbar-thumb{
     background-color: hsl(140 42% 42% / 0.5);
     border-radius: 10px;
     border: 1px solid #1D6F42;
 }
-.menu .cardModify .card select{
+.menu .newbos .card select{
     width: 20vw;
     color: black;
     border-radius: 5px;
@@ -273,7 +283,7 @@ a{
     display: flex;
     flex-direction: column;
 }
-.menu .cardModify .card select:focus{
+.menu .newbos .card select:focus{
     border: 2px solid #1D6F42;
     outline: none;
 }
@@ -333,96 +343,16 @@ a{
     color: #1D6F42;
     margin-right: 0.2em;
 }
-.menu .table .generate{
+.menu .table a .generate{
     display: flex;
-    width: 60%;
-    margin-top: 1em;
-}
-.menu .table .generate button{
-    background-color: #1D6F42;
-    height: 6vh;
     width: 100%;
-    border-radius: 10px;
-    color: whitesmoke;
-    font-weight: 600;
-    border: 1px solid #1D6F42;
-    cursor: pointer;
-    font-size: 15px;
-    font-family: 'Poppins';
+    margin-top: 1em;
+    justify-items: center;
 }
 a{
     text-decoration: none;
 }
-.menu .cardModify{
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    border: 2px solid #1D6F42;
-    width: 40%;
-    border-radius: 20px;
-    padding-bottom: 1em;
-    background-color: white;
-}
-.menu .cardModify h2{
-    font-size: 25px;
-    font-weight: 500;
-}
-.menu .cardModify .salle .scroll .checkbox{
-    display: flex;
-    flex-direction: column;
-}
-.menu .cardModify .salle .scroll .checkbox .label{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-.menu .cardModify .salle .scroll .checkbox .label label{
-    font-size: 15px;
-    font-weight: 500;
-}
-.menu .cardModify .salle .scroll{
-    overflow-y: scroll;
-    height: 20vh;
-    border: 1px solid #1D6F42;
-    border-radius: 10px;
-}
-.menu .cardModify button{
-    text-decoration: none;
-    background-color: #1D6F42;
-    color: whitesmoke;
-    height: 5vh;
-    width: 100%;
-    border: 1px solid #1D6F42;
-    border-radius: 10px;
-    margin-top: 1em;
-    cursor: pointer;
-}
-.menu .cardModify .salle .scroll::-webkit-scrollbar{
-    width: 0.8em;
-}
-.menu .cardModify .salle .scroll::-webkit-scrollbar-track{
-    background: whitesmoke;
-    border-right: 1px solid #1D6F42;
-    border-radius: 10px;
 
-}
-.menu .cardModify .salle .scroll::-webkit-scrollbar-thumb{
-    background-color: hsl(140 42% 42% / 0.5);
-    border-radius: 10px;
-    border: 1px solid #1D6F42;
-}
-.menu .cardModify .card select{
-    width: 20vw;
-    color: black;
-    border-radius: 5px;
-    border: 2px solid #1D6F42;
-    display: flex;
-    flex-direction: column;
-}
-.menu .cardModify .card select:focus{
-    border: 2px solid #1D6F42;
-    outline: none;
-}
 
 .menu .table .print .thead .box-table button{
     background-color: #1D6F42;
@@ -437,7 +367,7 @@ a{
     text-align: center;
     font-family: 'Poppins';
 }
-.menu .table .generate button{
+.menu .table a .generate button{
     background-color: #1D6F42;
     height: 6vh;
     width: 100%;
@@ -664,4 +594,360 @@ a{
     font-weight: 600;
     font-family: 'Poppins';
     text-transform: uppercase;
+}
+.delete-dialog{
+     position: fixed;
+     border: 2px solid black;
+     top: 50%;
+     left: 50%;
+     font-weight: 600;
+     transform: translate(-50% , -50%) scale(0);
+     z-index: 10;
+     background-color: white;
+     width: 300px;
+     border-radius: 20px;
+} 
+.delete-dialog.active{
+    transform: translate(-10% , -50%) scale(1);
+} 
+.delete-dialog .dialog-header{
+    padding: 10px 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid black  ;
+}
+.dialog-header .close-button{
+    cursor: pointer;
+    border: none;
+    outline: none;
+    background: none;
+    font-size: 1.25rem;
+    font-weight: bold;
+}
+.delete-dialog .dialog-body{
+    padding: 10px 15px;
+}
+
+.delete-dialog .dialog-footer{
+    display: flex;
+    justify-content: flex-end;
+    background-color: rgb(222, 213, 213);
+    border-bottom-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+    padding: 5px;
+
+}
+
+.dialog-footer button{
+   margin: 5px;
+   padding: 0.5rem;
+   border: none;
+   
+ 
+}
+
+.dialog-footer .delete-button{
+    background-color: red;
+    color: white;
+    border-radius: 12px;
+}
+.dialog-footer .cancel-button{
+    background: none;
+    color: black;
+}
+#overlay{
+
+    position: fixed;
+    opacity: 0.5;
+    transition: 200ms ease-in-out;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    pointer-events: none;
+
+}
+#overlay.active {
+    opacity: 1;
+    pointer-events: all;
+ 
+}
+.menu .table .print .thead.two .box-table #test{
+    background-color: red;
+    border: none;
+    width: 80%;
+
+}
+.menu .dashbord{
+    height: 100%;
+    width: 100%;
+}
+.menu .boxes{
+    display: flex;
+    height: 20%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+.menu .boxes .idbox{
+    height: 80%;
+    width: 25%;
+    border:2px solid #1D6F42;
+    border-radius: 10px;
+    margin: 1em;
+    cursor: pointer;
+    display: flex;
+    flex-direction: row;
+}
+.menu .boxes .idbox .boxicon{
+    width: 40%;
+    display: flex;
+}
+.menu .boxes .idbox .boxicon ion-icon{
+    font-size: 50px;
+    color: #163625;
+    margin: 0.2em;
+}
+.menu .boxes .idbox .icontext{
+    width: 60%;
+}
+.menu .boxes .idbox .icontext .number{
+    font-size: 24px;
+    font-weight: 600;
+    color: #1D6F42;
+    justify-content: end;
+    display: flex;
+    margin-right: 1em;
+    margin-top: 0.4em;
+}
+.menu .boxes .idbox .icontext .nameun{
+    font-size: 22px;
+    font-weight: 600;
+    color: #163625;
+    margin-left: 1.25em;
+    margin-top: -0.8em;
+}
+.menu .boxes .idbox .icontext .nameun.two{
+    margin-left: 2.6em;
+}
+.menu .boxes .idbox .icontext .nameun.three{
+    margin-left: -0.1em;
+}
+.menu .boxes .idbox .icontext .nameun.four{
+    margin-left: -1.3em;
+}
+.menu .charts{
+    display: flex;
+    height: 80%;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+.menu .charts .chart{
+    width: 50%;
+    height: 90%;
+    margin: 1em;
+    border-radius: 10px;
+}
+.show{
+    display: flex !important;
+}
+a{
+    text-decoration: none;
+}
+
+
+
+
+
+
+.delete-dialog-ens{
+    position: fixed;
+    border: 2px solid black;
+    top: 50%;
+    left: 50%;
+    font-weight: 600;
+    transform: translate(-50% , -50%) scale(0);
+    z-index: 10;
+    background-color: white;
+    width: 500px;
+    border-radius: 20px;
+} 
+.delete-dialog-ens.active{
+   transform: translate(-10% , -50%) scale(1);
+} 
+.delete-dialog-ens .dialog-header{
+   padding: 10px 15px;
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   border-bottom: 1px solid black  ;
+}
+.dialog-header .close-button{
+   cursor: pointer;
+   border: none;
+   outline: none;
+   background: none;
+   font-size: 1.25rem;
+   font-weight: bold;
+}
+.delete-dialog-ens .dialog-body{
+   padding: 10px 15px;
+}
+
+.delete-dialog-ens .dialog-footer{
+   display: flex;
+   justify-content: flex-end;
+   background-color: rgb(222, 213, 213);
+   border-bottom-right-radius: 20px;
+   border-bottom-left-radius: 20px;
+   padding: 5px;
+
+}
+
+.dialog-footer button{
+  margin: 5px;
+  padding: 0.5rem;
+  border: none;
+  
+
+}
+
+.dialog-footer .delete-button{
+   background-color: red;
+   color: white;
+   border-radius: 12px;
+}
+.dialog-footer .cancel-button{
+   background: none;
+   color: black;
+}
+.menu .listesurveillance{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    align-items: center;
+}
+.menu .listesurveillance .listeHeader{
+    display: flex;
+    background-color: #bad8c2;
+    width: 80%;
+    height: 8%;
+    margin-top: 2em;
+    border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
+    align-items: center;
+}
+.menu .listesurveillance .listeHeader p{
+    margin-left: 1em;
+    font-weight: 600;
+}
+.menu .listesurveillance .chargecours p{
+    font-weight: 600;
+    margin-left: 1em;
+    font-size: 14px;
+    color:white;
+}
+.menu .listesurveillance .chargecours{
+    display: flex;
+    background-color: #389b61;
+    width: 80%;
+    height: 6%;
+    align-items: center;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+.menu .listesurveillance .surveilanttitle{
+    display: flex;
+    background-color: #bad8c2;
+    width: 80%;
+    height: 8%;
+    margin-top: 2em;
+    border-top-right-radius: 10px;
+    border-top-left-radius: 10px;
+    align-items: center;
+}
+.menu .listesurveillance .surveilanttitle p{
+    font-weight: 600;
+    margin-left: 1em;
+}
+.menu .listesurveillance .listesurveillants{
+    display: flex;
+    background-color: #389b61;
+    height: 65%;
+    width: 80%;
+    border-bottom-left-radius: 10px;
+    border-bottom-right-radius: 10px;
+}
+.menu .listesurveillance .listesurveillants .scroll{
+    height: 100%;
+    width: 100%;
+    overflow-y: scroll;
+}
+.menu .listesurveillance .listesurveillants .scroll p{
+    font-weight: 500;
+    color: white;
+    margin-left: 1em;
+    font-size: 14px;
+}
+.menu .listesurveillance .listesurveillants .scroll::-webkit-scrollbar{
+    width: 0.8em;
+}
+.menu .listesurveillance .listesurveillants .scroll::-webkit-scrollbar-track{
+    background: #389b61;
+    border-right: 1px solid white;
+    border-radius: 10px;
+}
+.menu .listesurveillance .listesurveillants .scroll::-webkit-scrollbar-thumb{
+    background-color: white;
+    border-radius: 10px;
+    border: 1px solid #1D6F42;
+}
+
+#upload-file{
+    display: flex;
+    align-items: center;
+    background-color: #1D6F42;
+    color: white;
+    padding: 5px;
+    cursor: pointer;
+    margin-left: -0.4em;
+    font-size: 17px;
+    border: 2px solid #1D6F42;
+    border-top-right-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
+
+
+.menu .upload form label{
+    background-color: #1D6F42;
+    color: white;
+    font-family: 'Poppins';
+    font-weight: 600;
+    border: 1px solid #1D6F42;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-right: 3em;
+}
+.menu .upload form label input[type="file"]{
+    display: none;
+}
+.menu .upload form{
+    display: flex;
+    align-items: center;
+}
+.menu .upload form button{
+    background-color: #1D6F42;
+    color: white;
+    font-family: 'Poppins';
+    font-weight: 600;
+    border: 1px solid #1D6F42;
+    padding: 5px 10px;
+    border-radius: 5px;
+    cursor: pointer;
 }

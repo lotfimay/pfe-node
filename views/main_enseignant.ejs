@@ -1,32 +1,9 @@
 <%- include('./partials/header.ejs') %>
 <body>
     <div class="container">
-
-        <%
-        
-        if(user.type == 'SI' || user.type == 'IA'){%>
-            <%- include('./partials/navebar.ejs') %>
-        <%}%>
-
-        <%
-        if(user.type == 'SC'){%>
-            <%- include('./partials/navbars/sc_navbar.ejs') %>
-        <%}%>
-
-        <%
-
-        if(user.type == 'VD'){%>
-            <%- include('./partials/navbars/vd_navbar.ejs') %>
-        <%}%>
-        
-        <%
-        if(user.type == 'SP'){%>
-            <%- include('./partials/navbars/sp_navbar.ejs') %>
-        <%}%>  
-        
+            <%- include('./partials/navbars/ens_navbar.ejs') %>      
         <section class="menu">
-            <div class="dashbord">
-                <div class="boxes">
+            <div class="boxes">
                 <div class="idbox">
                     <div class="boxicon">
                         <ion-icon name="document-outline"></ion-icon>
@@ -71,7 +48,6 @@
                 <div class="chart">
                     <canvas id="myChart2"></canvas>
                 </div>
-            </div>
             </div>
         </section>
     </div>

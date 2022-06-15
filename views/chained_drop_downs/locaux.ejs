@@ -1,7 +1,7 @@
 <% 
   for(let index in locaux){%>
     <div class="label">
-          <label for="room"><%=locaux[index].code_local%></label>
-          <input type="checkbox" name="local" id="local" value="<%=locaux[index].code_local%>" >  
+          <label for="<%=locaux[index].code_local%>"><%=locaux[index].code_local%></label>
+          <input type="checkbox" name="local" id="<%=locaux[index].code_local%>" value="<%=locaux[index].code_local%>">  
     </div>
 <%}%> 

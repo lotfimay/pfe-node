@@ -1,8 +1,34 @@
 const express = require('express');
 const { PrismaClient }  = require('@prisma/client');
+const { redirect } = require('express/lib/response');
 const prisma = new PrismaClient();
 
 const router = express.Router();
+
+
+
+const check_departement_coherence = async(req , res , next) =>{
+    let departement = await prisma.section.findUnique({
+        where : {
+            code_section  : req.params.section_id,
+        },
+        select : {
+            Specialite : {
+                select : {
+                    Departement : {
+                        select : {
+                            code_departement : true,
+                        }
+                    }
+                }
+            }
+        }
+    });
+    if(departement.Specialite.Departement.code_departement != req.user.type){
+        return res.redirect('/');
+    }
+    else return next();
+}
 
 
 router.get('/' , async (req , res) =>{
@@ -29,16 +55,21 @@ router.get('/' , async (req , res) =>{
     return res.render('planifier' , {
         'licence' : licence_specialites,
         'master' : master_specialites,
-        'sections' : sections
+        'sections' : sections,
+        'user' : req.user
     });
 
 });
 
 router.get('/update' , (req , res) =>{
-    return res.render('update_plan');
+    return res.render('update_plan',{
+        'user' : req.user,
+    });
 });
 
-router.get('/update/:semestre/:session/:section_id/' , async (req,res) =>{
+
+
+router.get('/update/:semestre/:session/:section_id/'  , check_departement_coherence ,async (req,res) =>{
    
     let modules  = await prisma.examen.findMany({
         where : {
@@ -61,12 +92,13 @@ router.get('/update/:semestre/:session/:section_id/' , async (req,res) =>{
         'semestre' : req.params.semestre,
         'session' : req.params.session,
         'section' : req.params.section_id,
-        'flag' : 'update'
+        'flag' : 'update',
+        'user' : req.user,
     })
 });
 
 
-router.get('/update/:semestre/:session/:section_id/:module_id' , async (req , res) =>{
+router.get('/update/:semestre/:session/:section_id/:module_id'  , check_departement_coherence,async (req , res) =>{
       
     let section = await prisma.section.findUnique({
         where : {
@@ -89,9 +121,10 @@ router.get('/update/:semestre/:session/:section_id/:module_id' , async (req , re
 
     let code_creneau = await prisma.examen.findUnique({
          where : {
-              code_section_code_module : {
+              code_section_code_module_session : {
                   code_section : section.code_section,
                   code_module : my_module.code_module,
+                  session : parseInt(req.params.session),
               }
          },
     });
@@ -121,10 +154,25 @@ router.get('/update/:semestre/:session/:section_id/:module_id' , async (req , re
     });
     
     let autre_creneau_ids_codes  = autre_creneau_ids.map(element => element.code_creneau);
+
+    let creneaux_interdits = await prisma.examen.findMany({
+        where : {
+            code_section : req.params.section_id,
+        },
+        select: {
+            Creneau :{
+                select : {
+                    code_creneau : true,
+                }
+            }
+        }
+    });
+
+    let creneaux_interdits_ids = creneaux_interdits.map(element => element.Creneau.code_creneau);
     
     let autre_creneaux = await prisma.creneau.findMany({
         where : {
-            code_creneau : {in : autre_creneau_ids_codes  , notIn : code_creneau.code_creneau }
+            code_creneau : {in : autre_creneau_ids_codes  , notIn : creneaux_interdits_ids }
         }
     });
 
@@ -176,20 +224,22 @@ router.get('/update/:semestre/:session/:section_id/:module_id' , async (req , re
        'locaux' : locaux,
        'creneaux' : autre_creneaux,
        'autrelocaux' : autre_locaux,
+       'user' : req.user,
    })
 
 
 });
 
-router.post('/update/:semestre/:session/:section_id/:module_id' , async (req,res) => {
+router.post('/update/:semestre/:session/:section_id/:module_id' , check_departement_coherence,async (req,res) => {
 
-    console.log(req.body);
+    
 
     let exam = await prisma.examen.update({
         where : {
-            code_section_code_module : {
+            code_section_code_module_session : {
                 code_section : req.params.section_id, 
-                code_module : req.params.module_id,       
+                code_module : req.params.module_id,   
+                session : parseInt(req.params.session),    
             },
         },
         data : {
@@ -202,7 +252,7 @@ router.post('/update/:semestre/:session/:section_id/:module_id' , async (req,res
         where : {
             code_module : req.params.module_id,
             code_section : req.params.section_id,
-            code_creneau :  parseInt(req.body.creneau)  
+            code_creneau :  parseInt(req.body.creneau),
         }
     });
     let locaux = req.body.local;
@@ -223,8 +273,11 @@ router.post('/update/:semestre/:session/:section_id/:module_id' , async (req,res
 
             }
         });
+
+        console.log('Suiiiiiiiiiiiii Striiiiiiiiiiiiiiiing');
     }
     else{
+        console.log('Suiiiiiiiiiiiii Array');
         for(let index in locaux){
             let local = await prisma.local.findUnique({
                 where : {
@@ -232,21 +285,48 @@ router.post('/update/:semestre/:session/:section_id/:module_id' , async (req,res
                 }
             });
             let local_examen = await prisma.localExamen.create({
-            data : {
-                code_creneau : exam.code_creneau,
-                code_module : exam.code_module,
-                code_section : exam.code_section,
-                code_local : local.code_local,
+                data : {
+                     code_creneau : exam.code_creneau,
+                    code_module : exam.code_module,
+                    code_section : exam.code_section,
+                    code_local : local.code_local,
+                    }
+            });
+            let charge_cours = await prisma.chargeCours.findUnique({
+                where : {
+                    code_section_code_module : {
+                        code_section : req.params.section_id,
+                        code_module : req.params.module_id,
+                    },
+                },
+                select : {
+                    code_enseignant : true,
+                }
 
-            }
-        });
-    }
+           });
+           if(charge_cours != null && index == 0){
+              
+              let surveillance = await prisma.surveillance.create({
+                  data : {
+                    code_creneau : local_examen.code_creneau,
+                    code_module : local_examen.code_module,
+                    code_section : local_examen.code_section,
+                    code_local : local_examen.code_local,
+                    code_enseignant : charge_cours.code_enseignant,
+                  }
+              });
+           }
+        }
   }
 
-    res.redirect(`/planifier/update/${req.params.semestre}/${req.params.session}/${req.params.section_id}`);
+    res.json(
+        {
+        'dest' :
+        `/planifier/update/${req.params.semestre}/${req.params.session}/${req.params.section_id}`
+        });
 });
 
-router.get('/:semestre/:session/:section_id' , async (req , res) =>{
+router.get('/:semestre/:session/:section_id' , check_departement_coherence ,async (req , res) =>{
 
     
       let section = await prisma.section.findUnique({
@@ -303,7 +383,8 @@ router.get('/:semestre/:session/:section_id' , async (req , res) =>{
           'semestre' : req.params.semestre,
           'session' : req.params.session,
           'section' : req.params.section_id,
-          'flag' : 'planifier'
+          'flag' : 'planifier',
+          'user' : req.user,
       });
 
        
@@ -311,7 +392,7 @@ router.get('/:semestre/:session/:section_id' , async (req , res) =>{
 });
 
 
-router.get('/:semestre/:session/:section_id/:module_id' , async (req , res) => {
+router.get('/:semestre/:session/:section_id/:module_id' , check_departement_coherence ,async (req , res) => {
 
     
 
@@ -387,12 +468,13 @@ router.get('/:semestre/:session/:section_id/:module_id' , async (req , res) => {
 
    return res.render('planifier_module' , {
        'module' : module,
-        'creneaux' : creneaux
+       'creneaux' : creneaux,
+       'user' : req.user,
    })
 
 });
 
-router.post('/:semestre/:session/:section_id/:module_id' , async (req , res) =>{
+router.post('/:semestre/:session/:section_id/:module_id' ,check_departement_coherence ,async (req , res) =>{
 
     console.log(req.body);
 
@@ -436,12 +518,13 @@ router.post('/:semestre/:session/:section_id/:module_id' , async (req , res) =>{
 
             }
         });
+
+        console.log('Grrrrrrrrrr Striiiiiiing');
     }
 
     // to add later : ajouter le responsable du module autamaticement as a surveillant
     else{
-
-    
+        
     for(let index in locaux){
 
        let local_disponible = await prisma.reservation.findUnique({
@@ -474,13 +557,51 @@ router.post('/:semestre/:session/:section_id/:module_id' , async (req , res) =>{
                },
            });
 
-            // to add later ajouter le charge de cours comme surveillant automaticement
+           let charge_cours = await prisma.chargeCours.findUnique({
+                where : {
+                    code_section_code_module : {
+                        code_section : req.params.section_id,
+                        code_module : req.params.module_id,
+                    },
+                },
+                select : {
+                    code_enseignant : true,
+                }
+
+           });
+           console.log(charge_cours);
+           if(charge_cours != null && index == 0){
+
+              let already_in = await prisma.surveillance.findUnique({
+                where : {
+                    code_creneau_code_enseignant : {
+                        code_enseignant : charge_cours.code_enseignant,
+                        code_creneau : local_examen.code_creneau
+                    }
+                }
+              });
+              if(! already_in){
+                let surveillance = await prisma.surveillance.create({
+                    data : {
+                      code_creneau : local_examen.code_creneau,
+                      code_module : local_examen.code_module,
+                      code_section : local_examen.code_section,
+                      code_local : local_examen.code_local,
+                      code_enseignant : charge_cours.code_enseignant,
+                    }
+                });
+              }
+           }
 
             
         }
     }
 }
-    res.redirect(`/planifier/${req.params.semestre}/${req.params.session}/${req.params.section_id}`);
+    res.json( 
+        {
+        'dest' : `/planifier/${req.params.semestre}/${req.params.session}/${req.params.section_id}`
+       }
+    );
 
 
 

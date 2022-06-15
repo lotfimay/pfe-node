@@ -1,39 +1,356 @@
 <%- include('./partials/header.ejs') %>
 <body>
     <div class="container">
-        <%- include('./partials/navbars/vd_navbar.ejs') %>
+        <%
+        if(user.type == 'SI' || user.type == 'IA'){%>
+          <%- include('./partials/navebar.ejs') %> 
+        <%}%>
+      
+        <%
+        if(user.type == 'VD'){%>
+          <%- include('./partials/navbars/vd_navbar.ejs') %>
+        <%}%>
+
+        <%
+         if(user.type == 'SC'){%>
+          <%- include('./partials/navbars/sc_navbar.ejs') %>
+        <%}%>
         <section class="menu">
-          <div class="box">
-            <div class="insidebox semestre">
-                <p>Choisit le semestre :</p>
-                <select name="semestre" id="semestre">
-                    <option value="1">Semestre 1</option>
-                    <option value="2">Semestre 2</option>
-                </select>
+            <div class="box">
+                    <div class="insidebox semestre">
+                        <p>Choisit le semestre :</p>
+                        <select name="semestre" id="semestre">
+                            <option value="1">Semestre 1</option>
+                            <option value="2">Semestre 2</option>
+                        </select>
+                    </div>
+                    <div class="insidebox semestre">
+                        <p>Choisit la session :</p>
+                        <select name="session" id="session">
+                            <option value="1">Examen</option>
+                            <option value="2">Rattrapage</option>
+                        </select>
+                    </div>
+                    <div class="insidebox palier">
+                        <p>Choisit le palier :</p>
+                        <div class="form">
+                            <select name="palier" id="palier">
+                                <option value="empty">---------------</option>
+                                <option value="LICENCE">License</option>
+                                <option value="MASTER">Master</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="insidebox specialites">
+                        <p>Choisit la spécialité :</p>
+                        <div class="form">
+                            <select name="specialite" id="specialite" class="sp">
+                                    <option value="empty">---------------</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="insidebox niveau">
+                        <p>Choisit le niveau :</p>
+                        <select name="niveau" id="niveau">
+                            <option value="empty">---------------</option>
+                        </select>
+                    </div>
+                    <div class="insidebox sections">
+                        <p>Choisit la section :</p>
+                        <select name="section" id="section">
+                            <option value="empty">---------------</option>
+                        </select>
+                    </div>
+                    <div class="insidebox sections">
+                        <p>Choisit le module :</p>
+                        <select name="module" id="module">
+                            <option value="empty">---------------</option>
+                        </select>
+                    </div>
+                    <div class="button">
+                        <button id="confirm">Confirmer</button>
+                    </div>
+                    <div class="errors">
+                        <ul id="errors-list">
+                            
+                        </ul>
+                    </div>
             </div>
-            <div class="insidebox session">
-                <p>Choisit la session :</p>
-                <select name="session" id="session">
-                    <option value="1">Examen</option>
-                    <option value="2">Rattrapage</option>
-                </select>
-            </div>
-            <div class="button">
-                <button id="confirm">Confirmer</button>
-            </div>
-          </div>
-
         </section>
+
+       
+
     </div>
-
+    
     <script>
-     document.getElementById('confirm').addEventListener('click' , () =>{
-         const semestre = $("#semestre").val();
-         const session = $("#session").val();
+       
+        $("#semestre").change(function(){
+            const semestre = $(this).val();
+            const section = $("#section").val();
+            const session = $("#session").val();
 
-         window.location.href = `/consulter/${semestre}/${session}`;
-     })
+            if(section != 'empty' && session != 'empty'){
+                const url = '/ajax/modules__par__section';
+                $.ajax({
+                        url :url,
+                        data : {
+                            'code_section' : section,
+                            'semestre' : semestre,
+                            'session' : session,
+                        },
+                        success : function(data){
+                                $("#module").html(data);
+                        },
+                        error : function(err){
+                                    console.log(err);
+                        }
+                    });
+            }
+
+        });
+        $("#session").change(function(){
+
+            const session = $(this).val();
+            const section = $("#section").val();
+            const semestre = $("#semestre").val();
+
+            if(section != 'empty' && semestre != 'empty'){
+                const url = '/ajax/modules__par__section';
+                $.ajax({
+                        url :url,
+                        data : {
+                            'code_section' : section,
+                            'semestre' : semestre,
+                            'session' : session,
+                        },
+                        success : function(data){
+                                $("#module").html(data);
+                        },
+                        error : function(err){
+                                    console.log(err);
+                        }
+                    });
+            }
+            
+            
+
+        })
+        $("#palier").change(function(){
+           const palier = $(this).val();
+           let flag = false;
+           if(palier == 'LICENCE'){
+            
+            $("#palier").html(
+               '<option value="LICENCE">License</option><option value="MASTER">Master</option>'
+           ); 
+           flag = true
+           }
+           else{
+            $("#palier").html(
+               '<option value="MASTER">Master</option><option value="LICENCE">License</option>'
+           );
+           }
+           const url = "/ajax/specialites_par__palier"
+           $.ajax({
+            url:url,
+            data:{
+            'palier':palier
+            },
+            success:function(data){
+            $("#specialite").html(data);
+              if(flag){
+                 $("#niveau").html('<option value=\"2\">L2</option><option value=\"3\">L3</option>');
+              }
+             else{
+                $("#niveau").html('<option value="4">M1</option><option value="5">M2</option>');
+             }
+             const specialite = $("#specialite").val();
+             const niveau = $("#niveau").val();
+             $.ajax({
+               url : '/ajax/sections_par_niveau',
+               data : {
+               'code_specialite' : specialite,
+               'niveau' : niveau,
+               },
+               success : function(data){
+                      $("#section").html(data);
+                      const section  = $("#section").val();
+                      const url = '/ajax/modules__par__section'
+                      const semestre  = $("#semestre").val();
+                      const session = $("#session").val();
+                        $.ajax({
+                            url :url,
+                            data : {
+                            'code_section' : section,
+                            'semestre' : semestre,
+                            'session' : session,
+                            },
+                            success : function(data){
+                                    $("#module").html(data);
+                            },
+                            error : function(err){
+                                    console.log(err);
+                            }
+                        });
+
+               },
+               error : function(error){
+                   console.log(error)
+               }
+             });
+            },
+            error:function(error){
+                console.log(error)
+            }
+           })
+        });       
+        $("#niveau").change(function(){
+            let val = $(this).val();
+            let specialite = $("#specialite").val();
+            const url = "/ajax/sections_par_niveau"
+            $.ajax({
+            url:url,
+            data:{
+            'code_specialite':specialite,
+            'niveau' : val
+            },
+            success:function(data){
+            $("#section").html(data);
+                 const section  = $("#section").val();
+                 const semestre  = $("#semestre").val();
+                 const session = $("#session").val();
+                 const second_url = '/ajax/modules__par__section'
+                $.ajax({
+                    url :second_url,
+                    data : {
+                        'code_section' : section,
+                        'semestre' : semestre ,
+                        'session' : session,
+                    },
+                    success : function(data){
+                        $("#module").html(data);
+                    },
+                    error : function(err){
+                        console.log(err);
+                    }
+                })
+            },
+            error:function(error){
+                console.log(error)
+            }
+           })
+
+        });
+        $("#section").change(function(){
+            const section  = $("#section").val();
+            const semestre  = $("#semestre").val();
+            const session = $("#session").val();
+            const url = '/ajax/modules__par__section'
+            $.ajax({
+                url :url,
+                data : {
+                    'code_section' : section,
+                    'semestre' : semestre,
+                    'session' : session,
+                },
+                success : function(data){
+                    $("#module").html(data);
+                },
+                error : function(err){
+                     console.log(err);
+                }
+            })
+            
+        })
+        $("#specialite").change(function(){
+            let val = $(this).val();
+            let niveau = $("#niveau").val();
+            const url = "/ajax/sections_par_niveau";
+            $.ajax({
+            url:url,
+            data:{
+            'code_specialite':val,
+            'niveau' : niveau
+            },
+            success:function(data){
+            $("#section").html(data);
+            const section  = $("#section").val();
+            const semestre  = $("#semestre").val();
+            const session = $("#session").val();
+            const url = '/ajax/modules__par__section'
+            $.ajax({
+                url :url,
+                data : {
+                    'code_section' : section,
+                    'semestre' : semestre,
+                    'session' : session,
+                },
+                success : function(data){
+                    $("#module").html(data);
+                },
+                error : function(err){
+                     console.log(err);
+                }
+            })
+            
+            },
+            error:function(error){
+                console.log(error)
+            }
+           })
+        })
+        document.getElementById('confirm').addEventListener('click' , () =>{
+
+
+
+            // controle
+
+            const semestre = $("#semestre").val();
+            const session = $("#session").val();
+            
+
+            const palier = $("#palier").val();
+            const specilate = $("#specialite").val();
+
+            const section = $("#section").val();
+            const module = $("#module").val();
+
+
+            if(palier == 'empty' || palier == null){
+                document.getElementById("errors-list")
+                .innerHTML = '<li>Sélectionner un  palier</li>' ;
+                return;
+            }
+
+            if(specilate == 'empty' || palier == null){
+                document.getElementById("errors-list")
+                .innerHTML = '<li>Sélectionner une specialite</li>'
+                return;
+            }
+
+            if(section == 'empty' || palier == null){
+                document.getElementById("errors-list")
+                .innerHTML = '<li>Sélectionner une section</li>'
+                return;
+            }
+
+            if(module == 'empty' || module == null){
+                document.getElementById("errors-list")
+                .innerHTML = '<li>Sélectionner une module</li>'
+                return;
+            }
+
+
+
+
+            window.location.href = `/surveillance/${semestre}/${session}/${section}/${module}/consulter`
+    
+
+        });
+        
     </script>
+    
+
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
     <style>

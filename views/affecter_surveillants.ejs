@@ -1,10 +1,10 @@
 <%- include('./partials/header.ejs') %>
+<html>
 <body>
     <div class="container">
         <%- include('./partials/navebar.ejs') %>
         <section class="menu">
-            <div class="cardModify">
-                <form action="" method="post">
+            <div class="newbos">
                     <div class="card module">
                         <h2>Module :</h2>
                         <select name="module" id="module">
@@ -34,27 +34,83 @@
                             <div class="scroll">
                                 <div class="checkbox">
                                     <%
-                                       for(let index in enseignants_existent){%>
-                                        <div class="label">
-                                          <label for="surveillant"><%=enseignants_existent[index].Enseignant.nom_enseignant%> <%=enseignants_existent[index].Enseignant.prenom_enseignant%> ( <%=enseignants_existent[index].nb%> )</label>
-                                          <input type="checkbox" name="surveillant" id="surveillant" value="<%=enseignants_existent[index].Enseignant.code_enseignant%>" checked>  
+                                    for(let index in enseignants_existent){%>
+                                        <div class="label">        
+                                            <label for="<%=enseignants_existent[index].Enseignant.code_enseignant%>"><%=enseignants_existent[index].Enseignant.nom_enseignant%> <%=enseignants_existent[index].Enseignant.prenom_enseignant%> ( <%=enseignants_existent[index].nb%> )</label>
+                                            <input type="checkbox" name="surveillant" id="<%=enseignants_existent[index].Enseignant.code_enseignant%>" value="<%=enseignants_existent[index].Enseignant.code_enseignant%>" checked>
                                         </div>
-                                       <%}%>
+                                     <%}%>
+                                      
                                     <%
                                     for(let index in enseignants){%>
                                       <div class="label">
-                                          <label for="surveillant"><%=enseignants[index].nom_enseignant%> <%=enseignants[index].prenom_enseignant%> ( <%=enseignants[index].nb%> )</label>
-                                          <input type="checkbox" name="surveillant" id="surveillant" value="<%=enseignants[index].code_enseignant%>">  
+                                          <label for="<%=enseignants[index].code_enseignant%>"><%=enseignants[index].nom_enseignant%> <%=enseignants[index].prenom_enseignant%> ( <%=enseignants[index].nb%> )</label>
+                                          <input type="checkbox" name="surveillant" id="<%=enseignants[index].code_enseignant%>" value="<%=enseignants[index].code_enseignant%>">  
                                       </div>
                                     <%}%>
                                 </div>
                             </div>
                     </div>
-                    <button type="submit">Terminer</button>
-                </form>
+                    <button type="submit" id="confirm">Terminer</button>
+
+                    <div class="errors">
+                        <ul id="errors-list">
+                            
+                        </ul>
+                    </div>     
+                
             </div>
         </section>
     </div>
+    <script>
+        const submit_button = document.getElementById('confirm');
+        submit_button.addEventListener('click', () =>{
+            let surveillant =  getCheckedBoxes("surveillant");
+            let creneau = $("#creneau").val();
+        
+            if(surveillant == null){
+                document.getElementById("errors-list")
+                .innerHTML = '<li>Sélectionner deux  surveillants au minimum</li>';
+                return;
+            }
+           if(surveillant.length < 2){
+            document.getElementById("errors-list")
+                .innerHTML = '<li>Sélectionner deux  surveillants au minimum</li>';
+                return;
+           }
+            console.log(window.location.href.substring(22));
+
+           $.ajax({
+               url : '/' + window.location.href.substring(22) + '/',
+               data: {
+                  'surveillant' : surveillant,
+                  'creneau' : creneau,
+               },
+               method : 'POST',
+               success : function(data){
+                        window.location.href = data.dest;
+               },
+               error : function(err){
+                  console.log(err);
+               }
+           })
+            
+        });
+        function getCheckedBoxes(chkboxName) {
+                var checkboxes = document.getElementsByName(chkboxName);
+                var checkboxesChecked = [];
+                // loop over them all
+                for (var i=0; i<checkboxes.length; i++) {
+                    // And stick the checked ones onto an array...
+                    if (checkboxes[i].checked) {
+                    checkboxesChecked.push(checkboxes[i].value);
+                    }
+                }
+            // Return the array if it is non-empty, or null
+            return checkboxesChecked.length > 0 ? checkboxesChecked : null;
+        }  
+
+    </script>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
     <style>

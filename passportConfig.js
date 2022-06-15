@@ -7,6 +7,7 @@ const bcrypt = require("bcrypt");
 
 function initialize(passport) {
   console.log("Initialized");
+  
 
   const authenticateUser = async (username, password, done) => {
     
@@ -19,11 +20,10 @@ function initialize(passport) {
 
     if(user == null){
       return done(null, false, {
-        message: "No user with that user name"
+        message: "No user with that user name / email"
       });
     }
-    else{
-      
+    else{      
        if(await bcrypt.compare(password , user.password )){
             return done(null , user);
        }
@@ -43,7 +43,11 @@ function initialize(passport) {
   // object should be stored in the session. The result of the serializeUser method is attached
   // to the session as req.session.passport.user = {}. Here for instance, it would be (as we provide
   //   the user id as the key) req.session.passport.user = {id: 'xyz'}
-  passport.serializeUser((user, done) => done(null, user.user_id.toString()));
+  passport.serializeUser(
+    (user, done) => {
+        done(null, user.user_id.toString())       
+    }
+  );
 
   // In deserializeUser that key is matched with the in memory array / database or any data resource.
   // The fetched object is attached to the request object as req.user
@@ -51,13 +55,20 @@ function initialize(passport) {
   passport.deserializeUser(async (id, done) => {
 
     try{
-        let user = await prisma.users.findUnique({
-        where : {
-          user_id : parseInt(id),
-        }
-        });
-        console.log(`ID is ${user.user_id}`);
-        return done(null , user);
+         
+          let user = await prisma.users.findUnique({
+            where : {
+              user_id : parseInt(id),
+            },
+            select : {
+              user_id : true,
+              user_name : true,
+              email : true,
+              type : true,
+            }
+          }
+          );
+          return done(null , user);
     }catch(err){
       return done(err);
     }

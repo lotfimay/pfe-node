@@ -164,5 +164,42 @@ function ExcelDateToJSDate(serial) {
  
     return new Date(date_info.getFullYear(), date_info.getMonth(), date_info.getDate() + 1);
 }
+async function inserer_profs(req , res){
+
+
+    const workbook = xlsx.readFile('profs_2.xlsx');
+
+    let worksheets = {};
+
+    for(const sheetName of workbook.SheetNames){
+        worksheets[sheetName] = xlsx.utils.sheet_to_json(workbook.Sheets[sheetName])
+    }
+    const rows = worksheets.Sheet1;
+
+    for(index in rows){
+
+
+        try{
+            let enseignant = await prisma.enseignant.create({
+                data : {
+                    nom_enseignant : rows[index].Nom,
+                    prenom_enseignant : rows[index].Prenom,
+                    email : rows[index].email,
+                    code_grade : rows[index].Grade,
+                }
+            });
+        }catch(error){
+            console.log(error)
+        }
+
+        
+        
+        
+    }
+
+    return res.json('Done');
+
+
+}
 
 module.exports = readExcelFile;

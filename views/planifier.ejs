@@ -51,6 +51,12 @@
                     <div class="button">
                         <button id="confirm">Confirmer</button>
                     </div>
+
+                    <div class="errors">
+                        <ul id="errors-list">
+                            
+                        </ul>
+                    </div>
             </div>
         </section>
 
@@ -155,6 +161,33 @@
             const semestre = $("#semestre").val();
             const section = $("#section").val();
             const session = $("#session").val();
+
+
+
+
+            const palier = $("#palier").val();
+            const specilate = $("#specialite").val();
+
+
+            if(palier == 'empty' || palier == null){
+                document.getElementById("errors-list")
+                .innerHTML = '<li>Sélectionner un  palier</li>' ;
+                return;
+            }
+
+            if(specilate == 'empty' || palier == null){
+                document.getElementById("errors-list")
+                .innerHTML = '<li>Sélectionner une specialite</li>'
+                return;
+            }
+
+            if(section == 'empty' || palier == null){
+                document.getElementById("errors-list")
+                .innerHTML = '<li>Sélectionner une section</li>'
+                return;
+            }
+
+
             window.location.href = `/planifier/${semestre}/${session}/${section}`
     
 

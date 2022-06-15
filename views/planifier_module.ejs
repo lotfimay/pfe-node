@@ -3,8 +3,7 @@
     <div class="container">
         <%- include('./partials/navebar.ejs') %>
         <section class="menu">
-            <div class="cardModify">
-                <form action="" method="post">
+            <div class="newbos">
                     <div class="module">
                         <h2>Module :</h2>
                         <select name="module" id="module">
@@ -35,8 +34,12 @@
                             </div>
                         </div>
                     </div>
-                    <button type="submit">Terminer</button>
-                </form>
+                    <button type="submit" id="confirm">Terminer</button>
+                    <div class="errors">
+                        <ul id="errors-list">
+                            
+                        </ul>
+                    </div>          
             </div>
         </section>
     </div>
@@ -63,7 +66,59 @@
             }
            })
         }
-        })    
+        })
+        
+
+        const submit_button = document.getElementById('confirm');
+        submit_button.addEventListener('click', () =>{
+            let locaux =  getCheckedBoxes("local");
+            let creneau = $("#creneau").val();
+            let my_module = $("#module").val();
+
+
+            if(creneau == 'empty'){
+                document.getElementById("errors-list")
+                .innerHTML = '<li>Sélectionner un  Creneau</li>';
+                return;
+            }
+        
+            if(locaux == null){
+                document.getElementById("errors-list")
+                .innerHTML = '<li>Sélectionner un  local au minimum</li>';
+                return;
+            }
+
+           $.ajax({
+               url : '/' + window.location.href.substring(22) + '/',
+               data: {
+                  'local' : locaux,
+                  'creneau' : creneau,
+               },
+               method : 'POST',
+               success : function(data){
+                        window.location.href = data.dest;
+               },
+               error : function(err){
+                  console.log(err);
+               }
+           })
+            
+        });
+        function getCheckedBoxes(chkboxName) {
+                var checkboxes = document.getElementsByName(chkboxName);
+                var checkboxesChecked = [];
+                // loop over them all
+                for (var i=0; i<checkboxes.length; i++) {
+                    // And stick the checked ones onto an array...
+                    if (checkboxes[i].checked) {
+                    checkboxesChecked.push(checkboxes[i].value);
+                    }
+                }
+            // Return the array if it is non-empty, or null
+            return checkboxesChecked.length > 0 ? checkboxesChecked : null;
+        }
+
+
     </script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap');

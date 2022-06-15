@@ -1,14 +1,17 @@
 <%- include('./partials/header.ejs') %>
 <body>
     <div class="container">
+        <%- include('./partials/navbars/vd_navbar.ejs') %>
 
-            <%- include('./partials/navbars/vd_navbar.ejs') %>
-            
             <section class="menu">
-                <form action="" method="post" enctype=multipart/form-data>
-                    <input type="file" id="myFile" name="file">
-                    <button type="submit"> Send </button>
-                </form>
+                <div class="upload">
+                    <form action="" method="post" enctype=multipart/form-data>
+                        <label class="styleTHIS">
+                            Importer le fichier<input type="file" id="myFile" name="file">
+                        </label>
+                        <button type="submit" id="upload-file"> Envoyer </button>
+                    </form>
+                </div>
             </section>
         </section>
     </div>

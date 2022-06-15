@@ -1,0 +1,55 @@
+<%- include('./partials/header.ejs') %>
+<body>
+    <div class="container">
+
+        <%
+        if(user.type == 'SI' || user.type == 'IA'){%>
+            <%- include('./partials/navebar.ejs') %>
+        <%}%>
+
+        <%
+        if(user.type == 'SC'){%>
+            <%- include('./partials/navbars/sc_navbar.ejs') %>
+        <%}%>
+
+        <%
+
+        if(user.type == 'VD'){%>
+            <%- include('./partials/navbars/vd_navbar.ejs') %>
+        <%}%>
+
+        <section class="menu">
+            <div class="listesurveillance">
+                <div class="listeHeader">
+                    <p>Chargé de cours </p>
+                </div>
+                <div class="chargecours">
+                    <p><%=data.charge_cours%></p>
+                </div>
+                <div class="surveilanttitle">
+                        <p>Les surveillants </p>
+                </div>
+                <div class="listesurveillants">
+                    <div class="scroll">
+                        <%
+                         for(let index in data.surveillants){%>
+                            <p><%=data.surveillants[index].Enseignant.nom_enseignant%> <%=data.surveillants[index].Enseignant.prenom_enseignant%></p>
+                        <%}%>
+                    </div>
+                </div>
+            </div>
+        </section>
+      
+
+       
+
+    </div>
+    
+
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap');
+    </style>
+</body>
+</html>

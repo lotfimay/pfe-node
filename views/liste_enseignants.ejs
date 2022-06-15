@@ -1,6 +1,6 @@
 <%- include('./partials/header.ejs') %>
 <body>
-    <div class="container">
+    <div class="container active" id="overlay">
 
            <%
             if(user.type == 'VD'){%>
@@ -46,7 +46,7 @@
                         <div class="tbody">
                             <%
                               for(let index in enseignants){%>
-                                <div class="EnseignantLad">
+                                <div class="EnseignantLad" id="<%=index%>">
                                 <p><%=enseignants[index].code_enseignant%></p>
                                 <p><%=enseignants[index].nom_enseignant%></p>
                                 <p><%=enseignants[index].prenom_enseignant%></p>
@@ -58,11 +58,11 @@
 
                                   <%
                                    if(user.type == 'SC'){%>
-                                    <a href="/<%=semestre%>/<%=session%>/<%=enseignants[index].code_enseignant%>/convocation"> <button><ion-icon name="create-outline"></ion-icon></button></a>
+                                    <a href="/pdf/<%=semestre%>/<%=session%>/<%=enseignants[index].code_enseignant%>/convocation"> <button><ion-icon name="create-outline"></ion-icon></button></a>
                                    <%}%>
                                   <%
                                    if(user.type == 'SP'){%>
-                                    <a href="/enseignants/<%=enseignants[index].code_enseignant%>/delete/"><button><ion-icon class="trash" name="trash-outline"></ion-icon></button></a>
+                                    <button><ion-icon class="trash" name="trash-outline" onclick="delete_plan('<%index%>',{'nom' : '<%=enseignants[index].nom_enseignant%>' , 'prenom' : '<%=enseignants[index].prenom_enseignant%>' , 'code' : '<%=enseignants[index].code_enseignant%>' , 'id' : '<%=index%>'})"></ion-icon></button>
                                    <%}%>
         
                             </div>
@@ -73,6 +73,86 @@
             </section>
         </section>
     </div>
+    <div class="delete-dialog-ens" id="delete-dialog">
+                    <div class="dialog-header">
+                        <div class="title">
+                          <p>Confirmer la suppression</p>    
+                        </div>
+                        <button class="close-button" id="close-button">&times;</button>
+                    </div>    
+
+                    <div class="dialog-body">
+                        <p>
+                         Voulez vous vraiment retirer  l'enseignant <span id="nom_enseignant">Mayouf</span> <span id="prenom_enseignant"> Lotfi</span> de la base de données ?
+                        </p>
+                    </div>
+                    <div class="dialog-footer">
+                        <button class="cancel-button" id="cancel">Annuler</button>
+                        <button class="delete-button" id="confirm">Supprimer</button>   
+                    </div>
+    </div>
+    <script>
+        
+        const dialog = document.getElementById('delete-dialog');
+        const content = document.getElementById('overlay');
+        const cancel = document.getElementById('cancel');
+        const confirm = document.getElementById('confirm');
+        const close_button = document.getElementById('close-button');
+        
+
+        const showDialog = () =>{
+            dialog.classList.add('active');
+            content.classList.remove('active');
+        }
+
+        const dismissDialog = () =>{
+            content.classList.add('active');
+            dialog.classList.remove('active');
+        }
+
+       
+
+
+    
+
+ 
+    function delete_plan(id , result){  
+         
+
+        document.getElementById('nom_enseignant').innerHTML = result.nom;
+        document.getElementById('prenom_enseignant').innerHTML = result.prenom;
+
+
+        showDialog();
+        cancel.addEventListener('click' , () => dismissDialog());
+        confirm.addEventListener('click' , () => {
+
+                        $.ajax({
+                        url  : "/ajax/enseignant",
+                        method : 'DELETE',
+                        data : {
+                                'code' : result.code,
+                        },
+                        success : function(data){
+                        console.log(data);
+                        document.getElementById(result.id).remove();
+
+                    },
+    error : function(err){
+        console.log(err);
+    }
+
+})          
+
+
+dismissDialog();
+});
+       
+        close_button.addEventListener('click' , () => dismissDialog());
+
+       }
+  
+    </script>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
     <style>

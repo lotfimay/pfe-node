@@ -30,7 +30,7 @@ function generateheader(doc , invoice){
     doc.rect(250, 220, 300, 85).fillAndStroke('#fff', '#808080');
     doc.fill('#808080').stroke();
     doc.fontSize(14);
-    doc.text("Mr. "+ invoice.chargeCours, 270, 230, {lineBreak: false} );
+    doc.text(invoice.chargeCours, 270, 230, {lineBreak: false} );
     doc.text("Responsable de module : " + invoice.code_module, 270, 255, {lineBreak: false} );
     doc.text( invoice.Section.niveau + " " + invoice.Section.code_specialite + " Section " + invoice.Section.nom_section , 270, 280, {lineBreak: false} );
 }
