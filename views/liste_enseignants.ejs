@@ -57,7 +57,7 @@
                                   <%}%>
 
                                   <%
-                                   if(user.type == 'SC'){%>
+                                   if(user.type == 'SC' && flag == true){%>
                                     <a href="/pdf/<%=semestre%>/<%=session%>/<%=enseignants[index].code_enseignant%>/convocation"> <button><ion-icon name="create-outline"></ion-icon></button></a>
                                    <%}%>
                                   <%

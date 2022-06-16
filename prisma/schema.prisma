@@ -158,7 +158,7 @@ model ChargeCours {
 model users {
   user_id   BigInt  @id(map: "pk_users") @default(autoincrement())
   user_name String  @unique(map: "unique_username") @db.VarChar(200)
-  email     String? @db.VarChar(200)
+  email     String? @unique(map: "unique_email") @db.VarChar(200)
   password  String  @db.VarChar(200)
   type      String  @db.VarChar(20)
 }

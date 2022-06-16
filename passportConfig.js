@@ -9,18 +9,18 @@ function initialize(passport) {
   console.log("Initialized");
   
 
-  const authenticateUser = async (username, password, done) => {
+  const authenticateUser = async (email, password, done) => {
     
-    console.log(username, password);
+    console.log(email, password);
     const user = await prisma.users.findUnique({
       where : {
-        user_name : username,
+        email : email,
       }
     });
 
     if(user == null){
       return done(null, false, {
-        message: "No user with that user name / email"
+        message: "No user with that email"
       });
     }
     else{      
@@ -35,7 +35,7 @@ function initialize(passport) {
 
   passport.use(
     new LocalStrategy(
-      { usernameField: "username", passwordField: "password" },
+      { usernameField: "email", passwordField: "password" },
       authenticateUser
     )
   );

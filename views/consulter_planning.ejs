@@ -48,7 +48,7 @@
                             <h2>Salle</h2>
                         </div>
                         <%
-                          if(user.type == 'SC' || user.type == 'SI' || user.type == 'IA'){%>
+                          if(user.type == 'SC' || ((user.type == 'SI' || user.type == 'IA') && flag == true)){%>
                             <div class="box-table">
                                 <h2>Action</h2>
                             </div>
@@ -87,7 +87,7 @@
                             </div>
                         <%}%>
                         <%
-                        if(user.type == 'IA' || user.type == 'SI'){%>
+                        if((user.type == 'IA' || user.type == 'SI') && flag == true){%>
                             <div class="box-table">
                                 <button id="test" onclick="delete_plan(this.id , {'module' : '<%=exams[index].code_module%>' , 'section' : '<%=section.code_section%>' , 'id' : '<%=index%>'})" data-modal-target="#delete-dialog" >Supprimer</button>
                             </div>

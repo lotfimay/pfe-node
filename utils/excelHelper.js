@@ -1,7 +1,7 @@
 const { PrismaClient }  = require('@prisma/client');
 const prisma = new PrismaClient();
 const xlsx = require('xlsx');
-const fs = require('fs');
+
 
 async  function readExcelFile(filename){
 
