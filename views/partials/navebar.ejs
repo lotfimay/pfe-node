@@ -1,7 +1,7 @@
 <section class="navbare" id="navbare">
     <div class="top">
         <ion-icon name="settings-outline"></ion-icon>
-        <h1>Planificateur <%=user.type%></h1>
+        <h1 id="home">Planificateur <%=user.type%></h1>
     </div>
     <div class="buttons">
         <div class="actions">
@@ -11,7 +11,7 @@
                 <p>Planifier un examen</p>
             </div>
             </a>
-            <a href="/planifier/update/">
+            <a href="/planification/update/">
                 <div class="action one">
                 <ion-icon name="create-outline"></ion-icon>
                 <p>Modifier un examen</p>
@@ -46,3 +46,10 @@
         </div>
     </div>
 </section>
+
+<script>
+    document.getElementById('home')
+    .addEventListener('click' , () =>{
+      window.location.href = '/'
+    })    
+</script>

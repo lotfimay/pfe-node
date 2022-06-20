@@ -1,0 +1,93 @@
+<%- include('./partials/header.ejs') %>
+<html>
+<body>
+<div class="container">
+    <%- include('./partials/navbars/sc_navbar.ejs') %>
+    <section class="menu">
+        <div class="box">
+                <div class="insidebox semestre">
+                    <p>Choisit le grade :</p>
+                    <select name="grade" id="grade" required>
+
+                       <%
+                         for(let index in grades){%>
+                           <option value="<%=grades[index].code_grade%>"><%=grades[index].code_grade%></option>
+                        <%}%>
+                  
+                    </select>
+                </div>
+                <div class="insidebox session">
+                    <p>tapez le nombre de surveillances:</p>
+                    <input type="number" id="nb_sur"  required>
+                </div>
+                <div class="button">
+                    <button id="confirm">Confirmer</button>
+                </div>
+                <div id="result">
+                </div>
+            
+        </div>
+    </section>
+</div>
+</html>
+<script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+<script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+<style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200&display=swap');
+</style>
+<script>
+
+
+    let arr1 = '<%=arr1%>'.split(',');
+    console.log(arr1);
+    let arr2 = '<%=arr2%>'.split(',').map((element) => parseInt(element));
+    console.log(arr2);
+
+    let code_grade = $('#grade').find(":selected").text();
+    document.getElementById('nb_sur').value = arr2[arr1.indexOf(code_grade)];
+
+    $('#grade').change(function(){
+        let code_grade = $('#grade').find(":selected").text();
+        document.getElementById('nb_sur').value = arr2[arr1.indexOf(code_grade)];
+    })
+
+    document.getElementById('confirm')
+    .addEventListener('click' , () =>{
+            let nb_sv = $("#nb_sur").val();
+            let grade = $('#grade').find(":selected").text();
+
+            if(nb_sv == null || nb_sv < 1 || nb_sv >15){
+                document.getElementById("result")
+                    .innerHTML = '<p>Le nombre de surveillances doit etre entre 1 et 15</p>' ;
+                return;
+            }
+            if(arr1.indexOf(grade) == -1){
+                document.getElementById("result")
+                    .innerHTML = '<p>Grade invalid</p>' ;
+                return;
+            }
+            $.ajax({
+                url  : "/ajax/grade",
+                method : 'PATCH',
+                data : {
+                    'grade' : grade,
+                    'nb_sv' : nb_sv,
+                },
+                success : function(data){
+                    document.getElementById("result")
+                    .innerHTML = '<p>Updated successfully</p>' ;
+                    return;
+                    arr1 = data.arr1;
+                    arr2 = data.arr2;
+                },
+                error : function(error){
+                    console.log(error);
+                }
+            })
+           
+    })
+
+   
+    
+</script>
+</body>

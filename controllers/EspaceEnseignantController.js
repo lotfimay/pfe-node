@@ -38,11 +38,95 @@ const espace_enseignant_index = async (req , res) =>{
 
     console.log(enseignant.code_enseignant);
 
+    let text1;
+    let nb1;
+
+    let text2;
+    let nb2;
+
+    let text3;
+    let nb3;
+
+    let text4;
+    let nb4;
+
+    let modules;
+    let locaux;
+    let enseignants;
+    let departements;
+
+
+    let labels_2 = [];
+    let data_2 = [];
+
+
+    let specialites;
+
+
+
+    text1 = 'Modules';
+    modules = await prisma.module.findMany({
+        distinct : ['code_module'],
+    })
+    nb1 = modules.length;
+    text2 = 'Salles'
+    locaux = await prisma.local.findMany(
+            { distinct : ['code_local'] }
+    );
+    nb2 = locaux.length;
+    text3 = 'Surveillants'
+    enseignants = await prisma.enseignant.findMany({
+            distinct : ['code_enseignant']
+    })
+    nb3 = enseignants.length;
+    text4 = 'Départements';
+    departements = await prisma.departement.findMany({
+            distinct : ['code_departement']
+    });
+    nb4 = departements.length;
+    labels_2.push('SI' , 'IA');
+    specialites = await prisma.specialite.findMany();
+    data_2.push(specialites.filter(element => element.code_departement == 'SI').length);
+    data_2.push(specialites.filter(element => element.code_departement == 'IA').length);
+
+    let surveillants = await prisma.enseignant.findMany();
+    let labels = [];
+    labels.push('MCA');
+    labels.push('MCB');
+    labels.push('PROF');
+    let arr = [];
+    arr.push(surveillants.filter(element => element.code_grade == 'MCA').length);
+    arr.push(surveillants.filter(element => element.code_grade == 'MCB').length);
+    arr.push(surveillants.filter(element => element.code_grade == 'PROF').length);
+
+
+
+
+
+
+
+
+
+
+
+
     return res.render('main_enseignant', {
         'user' : req.user,
         'is_charge' : is_charge,
         'flag' : flag,
         'code_enseignant' : enseignant.code_enseignant,
+        'text1' : text1,
+        'text2' : text2,
+        'text3' : text3,
+        'text4' : text4,
+        'nb1' :   nb1,
+        'nb2' :   nb2,
+        'nb3' :   nb3,
+        'nb4' :   nb4,
+        'labels' : labels,
+        'data' : arr,
+        'labels_2' : labels_2,
+        'data_2' : data_2,
     })
 
 }

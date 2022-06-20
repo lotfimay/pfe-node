@@ -369,6 +369,49 @@ const pv_modules = async(req , res) =>{
 
 }
 
+const delete_reservations = async(req , res) =>{
+    try{
+        let deleted_reservations = await prisma.reservation.deleteMany();
+        let deleted_creneaux = await prisma.creneau.deleteMany();
+        let deleted_locaux = await prisma.local.deleteMany();
+        return res.json({'message' : 'reservations deleted successfully'});
+    }catch(err){
+        return res.status(500).json({'message' : 'something went wrong !'})
+    }
+    
+}
+
+const update_nb_sv = async(req , res) =>{
+    
+    try{
+        let updated_grade = await prisma.grade.update({
+            where : {
+                code_grade :  req.body.grade,
+            },
+            data : {
+                nombre_surveillances : parseInt(req.body.nb_sv),
+            }
+        });
+        let grades = await prisma.grade.findMany();
+        console.log(grades);
+        let arr1 = [];
+        let arr2 = [];
+        for(let index in grades){
+            arr1.push(grades[index].code_grade);
+            arr2.push(grades[index].nombre_surveillances);
+        }
+        res.json(
+            {
+                'message' : 'updated successfully',
+                'arr1' : arr1,
+                'arr2' : arr2,
+            })
+    }catch(err){
+        res.status(500).json({'message' : 'something went wrong !'})
+    }
+}
+
+
 
 module.exports = {
     locaux_disponibles,
@@ -381,4 +424,6 @@ module.exports = {
     verify_convocation,
     email__enseignant,
     pv_modules,
+    delete_reservations,
+    update_nb_sv,
 }

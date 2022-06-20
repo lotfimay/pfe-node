@@ -1,16 +1,19 @@
 <%- include('./partials/header.ejs') %>
 <body>
     <div class="container">
-            <%- include('./partials/navbars/ens_navbar.ejs') %>      
+   
+            <%- include('./partials/navbars/ens_navbar.ejs') %>
+                 
         <section class="menu">
-            <div class="boxes">
+            <div class="dashbord">
+                <div class="boxes">
                 <div class="idbox">
                     <div class="boxicon">
                         <ion-icon name="document-outline"></ion-icon>
                     </div>
                     <div class="icontext">
-                        <p class="number">105</p>
-                        <p class="nameun">Modules</p>
+                        <p class="number"><%=nb1%></p>
+                        <p class="nameun"><%=text1%></p>
                     </div>
                 </div>
                 <div class="idbox">
@@ -18,8 +21,8 @@
                         <ion-icon name="browsers-outline"></ion-icon>
                     </div>
                     <div class="icontext">
-                        <p class="number">105</p>
-                        <p class="nameun two">Salles</p>
+                        <p class="number"><%=nb2%></p>
+                        <p class="nameun two"><%=text2%></p>
                     </div>
                 </div>
                 <div class="idbox">
@@ -27,8 +30,8 @@
                         <ion-icon name="people-outline"></ion-icon>
                     </div>
                     <div class="icontext">
-                        <p class="number">105</p>
-                        <p class="nameun three">Surveillants</p>
+                        <p class="number"><%=nb3%></p>
+                        <p class="nameun three">Enseignants</p>
                     </div>
                 </div>
                 <div class="idbox">
@@ -36,8 +39,8 @@
                         <ion-icon name="school-outline"></ion-icon>
                     </div>
                     <div class="icontext">
-                        <p class="number">105</p>
-                        <p class="nameun four">Département</p>
+                        <p class="number"><%=nb4%></p>
+                        <p class="nameun four"><%=text4%></p>
                     </div>
                 </div>
             </div>
@@ -49,26 +52,44 @@
                     <canvas id="myChart2"></canvas>
                 </div>
             </div>
+            </div>
         </section>
     </div>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
    <script>
+       let labels = '<%=labels%>';
+       let data = '<%=data%>';
+       let labels_labels = labels.split(',');
+       let data_data  = [];
+       data = data.split(',');
+       for(let index in data){
+          data_data.push(parseInt(data[index]));
+       }
+
+       let labels_2 = '<%=labels_2%>';
+       let data_2 = '<%=data_2%>';
+       let labels_labels_2 = labels_2.split(',');
+       data_2 = data_2.split(',');
+       let data_data_2 = [];
+       for(let index in data_2){
+          data_data_2.push(parseInt(data_2[index]));
+       }
        const ctx = document.getElementById('myChart').getContext('2d');
        const Mychart = new Chart(ctx, {
         type: 'pie',
         data:{
             labels: [
-            'Red',
-            'Blue',
-            'Yellow'
+            labels_labels[0],
+            labels_labels[1],
+            labels_labels[2],
             ],
         datasets: [{
             label: 'My First Dataset',
-            data: [300, 50, 100],
+            data: data_data,
             backgroundColor: [
             '#3DD984',
             '#1D6F42',
-            '#113E25'
+            '#113E25',
             ],
             hoverOffset: 4
         }]
@@ -83,13 +104,12 @@
         type: 'doughnut',
         data:{
             labels: [
-            'Red',
-            'Blue',
-            'Yellow'
+              labels_labels_2[0],
+              labels_labels_2[1],
             ],
         datasets: [{
             label: 'My First Dataset',
-            data: [300, 50, 100],
+            data: data_data_2,
             backgroundColor: [
             '#113E25',
             '#1D6F42',
@@ -103,6 +123,8 @@
                 maintainAspectRatio: false,
             }
        });
+
+
    </script>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>

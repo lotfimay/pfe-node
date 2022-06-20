@@ -1,6 +1,6 @@
 <%- include('./partials/header.ejs') %>
 <body>
-    <div class="container">
+    <div class="container active" id="overlay">
         <%
         if(user.type == 'SI' || user.type == 'IA'){%>
           <%- include('./partials/navebar.ejs') %> 
@@ -81,6 +81,29 @@
        
 
     </div>
+    <%
+      if(user.type == 'VD'){%>
+
+        <div class="delete-dialog-reservations" id="delete-dialog">
+                    <div class="dialog-header">
+                        <div class="title">
+                          <p>Confirmer la suppression</p>    
+                        </div>
+                        <button class="close-button" id="close-button">&times;</button>
+                    </div>    
+
+                    <div class="dialog-body">
+                        <p>
+                         Voulez vous vraiment supprimer toutes les reservations ?
+                        </p>
+                    </div>
+                    <div class="dialog-footer">
+                        <button class="cancel-button" id="cancel">Annuler</button>
+                        <button class="delete-button" id="delete">Supprimer</button>   
+                    </div>
+        </div>
+
+      <%}%>
     
     <script>
         $("#palier").change(function(){
@@ -215,7 +238,49 @@
     
 
         });
+        const dialog = document.getElementById('delete-dialog');
+        const content = document.getElementById('overlay');
+        const cancel = document.getElementById('cancel');
+        const confirm = document.getElementById('delete');
+        const close_button = document.getElementById('close-button');
         
+        console.log(confirm.innerHTML);
+
+        const showDialog = () =>{
+            dialog.classList.add('active');
+            content.classList.remove('active');
+        }
+
+        const dismissDialog = () =>{
+            content.classList.add('active');
+            dialog.classList.remove('active');
+        }
+
+        const delete_reservation = document.getElementById('delete_reservation')
+        .addEventListener('click' , () =>{
+            showDialog();
+            cancel.addEventListener('click' , () => dismissDialog());
+            confirm.addEventListener('click' , () => {
+                console.log('clicked');
+                $.ajax({
+                        url  : "/ajax/reservations",
+                        method : 'DELETE',
+                        success : function(data){
+                                console.log(data);
+            
+                        },
+                        error : function(err){
+                            console.log(err);
+                        }
+
+                });        
+                dismissDialog();
+            });
+
+
+            close_button.addEventListener('click' , () => dismissDialog());            
+        });
+
     </script>
     
 

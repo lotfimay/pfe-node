@@ -91,6 +91,30 @@
                         <button class="delete-button" id="confirm">Supprimer</button>   
                     </div>
     </div>
+
+    <%
+      if(user.type == 'VD'){%>
+
+        <div class="delete-dialog-reservations" id="delete-dialog-r">
+                    <div class="dialog-header">
+                        <div class="title">
+                          <p>Confirmer la suppression</p>    
+                        </div>
+                        <button class="close-button" id="close-button-r">&times;</button>
+                    </div>    
+
+                    <div class="dialog-body">
+                        <p>
+                         Voulez vous vraiment supprimer toutes les reservations ?
+                        </p>
+                    </div>
+                    <div class="dialog-footer">
+                        <button class="cancel-button" id="cancel-r">Annuler</button>
+                        <button class="delete-button" id="delete">Supprimer</button>   
+                    </div>
+        </div>
+
+    <%}%>
     <script>
         
         const dialog = document.getElementById('delete-dialog');
@@ -151,7 +175,47 @@ dismissDialog();
         close_button.addEventListener('click' , () => dismissDialog());
 
        }
-  
+       const dialog_r = document.getElementById('delete-dialog-r');
+        const content_r = document.getElementById('overlay');
+        const cancel_r = document.getElementById('cancel-r');
+        const confirm_r = document.getElementById('delete');
+        const close_button_r = document.getElementById('close-button-r');
+        
+
+        const showDialog_r = () =>{
+            dialog_r.classList.add('active');
+            content_r.classList.remove('active');
+        }
+
+        const dismissDialog_r = () =>{
+            content_r.classList.add('active');
+            dialog_r.classList.remove('active');
+        }
+
+        const delete_reservation = document.getElementById('delete_reservation')
+        .addEventListener('click' , () =>{
+            showDialog_r();
+            cancel_r.addEventListener('click' , () => dismissDialog_r());
+            confirm_r.addEventListener('click' , () => {
+                $.ajax({
+                        url  : "/ajax/reservations",
+                        method : 'DELETE',
+                        success : function(data){
+                                console.log(data);
+            
+                        },
+                        error : function(err){
+                            console.log(err);
+                        }
+
+                });        
+                dismissDialog_r();
+            });
+
+
+close_button_r.addEventListener('click' , () => dismissDialog_r());            
+        });
+
     </script>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>

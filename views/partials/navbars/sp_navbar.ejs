@@ -1,7 +1,7 @@
 <section class="navbare" id="navbare">
     <div class="top">
         <ion-icon name="settings-outline"></ion-icon>
-        <h1>Service des personnels</h1>
+        <h1 id="home">Service des personnels</h1>
     </div>
     <div class="buttons">
         <div class="actions">
@@ -30,3 +30,10 @@
         </div>
     </div>
 </section>
+
+<script>
+    document.getElementById('home')
+    .addEventListener('click' , () =>{
+      window.location.href = '/'
+    })    
+ </script>

@@ -229,7 +229,14 @@ const surveillance_local = async (req , res)=>{
         nb._count.code_enseignant = grade.nombre_surveillances - nb._count.code_enseignant;
         enseignants[index].nb  = nb._count.code_enseignant;
     }
-  
+    
+    enseignant_deja_selectionner =  enseignant_deja_selectionner.sort((ens1 , ens2) =>{
+         return ens2.nb - ens1.nb;
+    });
+
+    enseignants = enseignants.sort((ens1 , ens2) =>{
+        return ens2.nb - ens1.nb;
+    })
 
 
 

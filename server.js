@@ -6,7 +6,7 @@ const passport = require("passport");
 const flash = require("express-flash");
 const session = require("express-session");
 const initializePassport = require("./passportConfig");
-const bcrypt = require('bcrypt');
+
 
 
 
@@ -32,6 +32,7 @@ const prisma = new PrismaClient();
 
 // middleware
 const globalMiddlewares = require("./middlewares/globalMiddlewares");
+const { redirect } = require('express/lib/response');
 
 
 
@@ -113,6 +114,15 @@ app.get('/' ,globalMiddlewares.checkNotAuthenticated, globalMiddlewares.check_no
     let enseignants;
     let departements;
 
+
+    let labels_2 = [];
+    let data_2 = [];
+
+
+    let specialites;
+
+    
+
     switch(req.user.type){
          
         case 'IA':
@@ -143,6 +153,14 @@ app.get('/' ,globalMiddlewares.checkNotAuthenticated, globalMiddlewares.check_no
                 distinct : ['code_departement']
             });
             nb4 = departements.length;
+            labels_2.push('LICENCE' , 'MASTER');
+            specialites = await prisma.specialite.findMany({
+                where : {
+                    code_departement : 'IA'
+                }
+            });
+            data_2.push(specialites.filter(element => element.palier == 'LICENCE').length);
+            data_2.push(specialites.filter(element => element.palier == 'MASTER').length);
             break;
         case 'SI':
             text1 = 'Modules';
@@ -172,6 +190,16 @@ app.get('/' ,globalMiddlewares.checkNotAuthenticated, globalMiddlewares.check_no
                 distinct : ['code_departement']
             });
             nb4 = departements.length;
+            labels_2.push('LICENCE' , 'MASTER');
+            specialites = await prisma.specialite.findMany({
+                where : {
+                    code_departement : 'SI'
+                }
+            });
+            console.log(specialites.filter(element => element.palier == 'LICENCE'));
+            data_2.push(specialites.filter(element => element.palier == 'LICENCE').length);
+            data_2.push(specialites.filter(element => element.palier == 'MASTER').length);
+            console.log(specialites.filter(element => element.palier == 'MASTER'));
             break
         default :
                 text1 = 'Modules';
@@ -194,11 +222,24 @@ app.get('/' ,globalMiddlewares.checkNotAuthenticated, globalMiddlewares.check_no
                         distinct : ['code_departement']
                 });
                 nb4 = departements.length;
+                labels_2.push('SI' , 'IA');
+                specialites = await prisma.specialite.findMany();
+                data_2.push(specialites.filter(element => element.code_departement == 'SI').length);
+                data_2.push(specialites.filter(element => element.code_departement == 'IA').length);
                 break;
     }
 
  
-       
+    let surveillants = await prisma.enseignant.findMany();
+    let labels = [];
+    labels.push('MCA');
+    labels.push('MCB');
+    labels.push('PROF');
+    let arr = [];
+    arr.push(surveillants.filter(element => element.code_grade == 'MCA').length);
+    arr.push(surveillants.filter(element => element.code_grade == 'MCB').length);
+    arr.push(surveillants.filter(element => element.code_grade == 'PROF').length);
+
 
                
         
@@ -214,9 +255,35 @@ app.get('/' ,globalMiddlewares.checkNotAuthenticated, globalMiddlewares.check_no
         'nb2' :   nb2,
         'nb3' :   nb3,
         'nb4' :   nb4,
+        'labels' : labels,
+        'data' : arr,
+        'labels_2' : labels_2,
+        'data_2' : data_2, 
     });  
 });
 
+app.get('/nombre-surveillance' , globalMiddlewares.checkNotAuthenticated,  async(req , res , next) =>{
+        if(req.user.type != 'SC'){
+            return res.redirect('/');
+        }
+        else return next();
+} , async(req , res) =>{
+
+    let grades = await prisma.grade.findMany();
+    console.log(grades);
+    let arr1 = [];
+    let arr2 = [];
+    for(let index in grades){
+        arr1.push(grades[index].code_grade);
+        arr2.push(grades[index].nombre_surveillances);
+    }
+    return res.render('nb_surveillance_par_grade' , {
+        'user' : req.user,
+        'grades' : grades,
+        'arr1' : arr1,
+        'arr2' : arr2,
+    })
+})
 
 app.use('/espace-enseignant' , globalMiddlewares.checkNotAuthenticated  ,globalMiddlewares.check_enseignant ,espaceEnseignantRouter);
 

@@ -1,7 +1,7 @@
 <section class="navbare" id="navbare">
     <div class="top">
         <ion-icon name="settings-outline"></ion-icon>
-        <h1>Agent de la scolarité</h1>
+        <h1 id="home">Agent de la scolarité</h1>
     </div>
     <div class="buttons">
         <div class="actions">
@@ -30,6 +30,12 @@
                     <p>La liste des enseignants</p>
                 </div>
             </a>
+            <a href="/nombre-surveillance/">
+                <div class="action">
+                    <ion-icon name="eye-outline"></ion-icon>
+                    <p>Nombre surveillances par grade</p>
+                </div>
+            </a>
         </div>
         <div class="logout">
             <a href="/logout/">
@@ -41,3 +47,10 @@
         </div>
     </div>
 </section>
+
+<script>
+   document.getElementById('home')
+   .addEventListener('click' , () =>{
+     window.location.href = '/'
+   })    
+</script>

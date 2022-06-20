@@ -951,3 +951,74 @@ a{
     border-radius: 5px;
     cursor: pointer;
 }
+
+.delete-dialog-reservations{
+    position: fixed;
+    border: 2px solid black;
+    top: 50%;
+    left: 50%;
+    font-weight: 600;
+    transform: translate(-50% , -50%) scale(0);
+    z-index: 10;
+    background-color: white;
+    width: 500px;
+    border-radius: 20px;
+} 
+.delete-dialog-reservations.active{
+   transform: translate(-20% , -50%) scale(1);
+} 
+.delete-dialog-reservations .dialog-header{
+   padding: 10px 15px;
+   display: flex;
+   justify-content: space-between;
+   align-items: center;
+   border-bottom: 1px solid black  ;
+}
+.dialog-header .close-button{
+   cursor: pointer;
+   border: none;
+   outline: none;
+   background: none;
+   font-size: 1.25rem;
+   font-weight: bold;
+}
+.delete-dialog-reservations .dialog-body{
+   padding: 10px 15px;
+}
+
+.delete-dialog-reservations .dialog-footer{
+   display: flex;
+   justify-content: flex-end;
+   background-color: rgb(222, 213, 213);
+   border-bottom-right-radius: 20px;
+   border-bottom-left-radius: 20px;
+   padding: 5px;
+
+}
+
+.dialog-footer button{
+  margin: 5px;
+  padding: 0.5rem;
+  border: none;
+  
+
+}
+
+.dialog-footer .delete-button{
+   background-color: red;
+   color: white;
+   border-radius: 12px;
+}
+.dialog-footer .cancel-button{
+   background: none;
+   color: black;
+}
+#home{
+    cursor: pointer;
+}
+#nb_sur{
+    border-radius: 5px;
+    border: 2px solid #1D6F42;
+    width: 38%;
+    padding: 4px;
+}

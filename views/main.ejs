@@ -1,6 +1,6 @@
 <%- include('./partials/header.ejs') %>
 <body>
-    <div class="container">
+    <div class="container active" id="overlay">
 
         <%
         
@@ -75,24 +75,111 @@
             </div>
         </section>
     </div>
+
+    <%
+      if(user.type == 'VD'){%>
+
+        <div class="delete-dialog-reservations" id="delete-dialog">
+                    <div class="dialog-header">
+                        <div class="title">
+                          <p>Confirmer la suppression</p>    
+                        </div>
+                        <button class="close-button" id="close-button">&times;</button>
+                    </div>    
+
+                    <div class="dialog-body">
+                        <p>
+                         Voulez vous vraiment supprimer toutes les reservations ?
+                        </p>
+                    </div>
+                    <div class="dialog-footer">
+                        <button class="cancel-button" id="cancel">Annuler</button>
+                        <button class="delete-button" id="confirm">Supprimer</button>   
+                    </div>
+        </div>
+
+      <%}%>
+
+    <script>
+
+
+        const dialog = document.getElementById('delete-dialog');
+        const content = document.getElementById('overlay');
+        const cancel = document.getElementById('cancel');
+        const confirm = document.getElementById('confirm');
+        const close_button = document.getElementById('close-button');
+        
+
+        const showDialog = () =>{
+            dialog.classList.add('active');
+            content.classList.remove('active');
+        }
+
+        const dismissDialog = () =>{
+            content.classList.add('active');
+            dialog.classList.remove('active');
+        }
+
+        const delete_reservation = document.getElementById('delete_reservation')
+        .addEventListener('click' , () =>{
+            showDialog();
+            cancel.addEventListener('click' , () => dismissDialog());
+            confirm.addEventListener('click' , () => {
+                $.ajax({
+                        url  : "/ajax/reservations",
+                        method : 'DELETE',
+                        success : function(data){
+                                console.log(data);
+            
+                        },
+                        error : function(err){
+                            console.log(err);
+                        }
+
+                });        
+                dismissDialog();
+            });
+
+
+close_button.addEventListener('click' , () => dismissDialog());            
+        });
+
+    </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
-   <script>
+    <script>
+       let labels = '<%=labels%>';
+       let data = '<%=data%>';
+       let labels_labels = labels.split(',');
+       let data_data  = [];
+       data = data.split(',');
+       for(let index in data){
+          data_data.push(parseInt(data[index]));
+       }
+
+       let labels_2 = '<%=labels_2%>';
+       let data_2 = '<%=data_2%>';
+       let labels_labels_2 = labels_2.split(',');
+       data_2 = data_2.split(',');
+       let data_data_2 = [];
+       for(let index in data_2){
+          data_data_2.push(parseInt(data_2[index]));
+       }
        const ctx = document.getElementById('myChart').getContext('2d');
        const Mychart = new Chart(ctx, {
         type: 'pie',
         data:{
             labels: [
-            'Red',
-            'Blue',
-            'Yellow'
+            labels_labels[0],
+            labels_labels[1],
+            labels_labels[2],
             ],
         datasets: [{
             label: 'My First Dataset',
-            data: [300, 50, 100],
+            data: data_data,
             backgroundColor: [
             '#3DD984',
             '#1D6F42',
-            '#113E25'
+            '#113E25',
             ],
             hoverOffset: 4
         }]
@@ -107,13 +194,12 @@
         type: 'doughnut',
         data:{
             labels: [
-            'Red',
-            'Blue',
-            'Yellow'
+              labels_labels_2[0],
+              labels_labels_2[1],
             ],
         datasets: [{
             label: 'My First Dataset',
-            data: [300, 50, 100],
+            data: data_data_2,
             backgroundColor: [
             '#113E25',
             '#1D6F42',
@@ -127,7 +213,9 @@
                 maintainAspectRatio: false,
             }
        });
-   </script>
+
+
+    </script>
     <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
     <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
     <style>
